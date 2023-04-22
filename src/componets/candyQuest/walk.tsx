@@ -1,6 +1,5 @@
 import './walk.css'
 import  { DragEventHandler, useRef, useState } from "react"
-import  {flushSync} from 'react-dom'
 import {AiOutlinePlayCircle} from 'react-icons/ai'
 import {RiDeleteBinFill} from 'react-icons/ri'
 
@@ -10,7 +9,7 @@ type Program = { text: string; style: string | null }
 function Walk() {
   const dragItemsParent = useRef<HTMLDivElement>(null);
   const emojiRef = useRef<HTMLDivElement>(null)
-  const gumRef = useRef<HTMLDivElement>(null)
+  const gumRef = useRef<HTMLButtonElement>(null)
   const dragedItemRef = useRef<HTMLElement>(null);
   const deleteRef = useRef<HTMLDivElement>(null)
   const gameAreaRef = useRef<HTMLDivElement>(null)
@@ -18,6 +17,9 @@ function Walk() {
   const [deleteIndex, setDeleteIndex]  = useState<number>()
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const [program, setProgram] = useState<Program[]>([{text:'onstart', style:null}]);
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [gameOver, setGameOver] = useState<boolean>(false)
 
   const  dragItems:DragEventHandler = (e)  => {
@@ -27,6 +29,8 @@ function Walk() {
 
   const handleDragOver:DragEventHandler = (e) => {
     e.preventDefault();
+       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
     if (e.target.classList.contains('delete')){
        deleteRef.current?.classList.remove('invisible')
     }
@@ -44,7 +48,7 @@ function Walk() {
   };
 
 const deleteItem = () => {
-  const temp = [...program].filter((program, i) => i !== deleteIndex)
+  const temp = [...program].filter((_program, i) => i !== deleteIndex)
   setProgram(temp)
 }
 
@@ -53,16 +57,24 @@ const moveAndEat = () => {
   if(program.length == 1 && program[0].text == 'onstart') return
   const length = program.length
   const destination= gameAreaRef.current?.childNodes
-  let emojiDOMRect = emojiRef.current?.getBoundingClientRect()
+  const emojiDOMRect = emojiRef.current?.getBoundingClientRect()
   let diffrence;
   if(length == 2){
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
     destinationRef.current = destination[1]
     const gumDOMRect = destinationRef.current?.getBoundingClientRect()
+       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
   diffrence = (gumDOMRect.x - emojiDOMRect.x) - 50
   }
   if(length == 3){
+       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
     destinationRef.current = destination[3]
     const gumDOMRect = destinationRef.current?.getBoundingClientRect()
+       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
     diffrence = (gumDOMRect.x - emojiDOMRect.x) - 150
   }
   if(length >= 4){
@@ -82,13 +94,16 @@ const moveAndEat = () => {
        setGameOver(true)
       return
     }
-    gumRef.current.style.display = 'none'
+    if(gumRef.current){
+      gumRef.current.style.display = 'none'
+    }
  }))
  console.log(animation)
 }
 
   return (
     <div className='w-screen playArea h-screen' onDragOver={(e) => e.preventDefault()} onDrop={() => deleteRef.current?.classList.add('invisible')}>
+
     <div className="w-4/5 h-auto flex mx-auto flex-wrap justify-center responsive">
       <div ref={deleteRef}  onDrop = {deleteItem} onDragOver={handleDragOver} className="delete w-48 h-full bg-slate-50 absolute left-0 flex justify-center items-center invisible">
         <div className='w-9'>
@@ -112,10 +127,13 @@ const moveAndEat = () => {
         style={{maxHeight:'500px', height:'300px', overflowY:'auto'}}
       >
        {
-        program.map(({text, style}:{text:string, style:string | null}, i:number) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        program.map(({text}:{text:string, style:string | null}, i:number) => {
           return <div onDragStart={(e) => {
             deleteRef.current?.classList.remove('invisible')
             setDeleteIndex(i)
+               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+               //@ts-ignore
             dragedItemRef.current = e.target
           }} draggable = {i !== 0 ? true : false}  key={i} className="w-24 -m-2 overflow-x-hidden dragged">
             {text == 'onstart' ? <img src="src\assets\image\onstart.png" alt="" className='w-auto m-0 p-0' />  : <img src="src\assets\image\walk.webp" alt="" className='w-auto m-0 p-0 dragged' />}
