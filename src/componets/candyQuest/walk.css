@@ -1,0 +1,55 @@
+.playArea{
+    background: #F0C27B;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #4B1248, #F0C27B);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #4B1248, #F0C27B); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    
+}
+
+
+
+.emoji{
+    width: 100px;
+    animation-name: moveToRight;
+    animation-delay: 1s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
+    animation-duration: 5s;
+    /* animation-play-state: running; */
+    animation-timing-function: ease;
+}
+
+
+@keyframes moveToRight{
+    0%{
+        transform: translateX(0%)
+    } 
+    100%{
+        transform: translateX(410px);        
+    }
+}
+
+
+
+@media (width <= 768px){
+    .responsive{
+      width: 90vw !important;
+      justify-content: space-between!important;
+    }
+
+    .animationArea{
+        width: 90vw !important;
+        justify-content: space-between !important;
+    }
+.animationArea .character{
+    width: 100px;
+    height: auto;
+}
+
+    .animationArea .dot{
+        width: 50px;
+        margin: 0 30px;
+    }
+    .animationArea .gum{
+        margin: 0 10px;
+    }
+}
