@@ -116,7 +116,7 @@ const moveAndEat = () => {
           onDragStart={dragItems}
           className="w-20"
         >
-          <img src="src\assets\image\walk.webp" alt="" className='w-full' />
+          <img src="public\image\walk.webp" alt="" className='w-full' />
         </button>
       </div>
       <div
@@ -136,7 +136,7 @@ const moveAndEat = () => {
                //@ts-ignore
             dragedItemRef.current = e.target
           }} draggable = {i !== 0 ? true : false}  key={i} className="w-24 -m-2 overflow-x-hidden dragged">
-            {text == 'onstart' ? <img src="src\assets\image\onstart.png" alt="" className='w-auto m-0 p-0' />  : <img src="src\assets\image\walk.webp" alt="" className='w-auto m-0 p-0 dragged' />}
+            {text == 'onstart' ? <img src="public\image\onstart.png" alt="" className='w-auto m-0 p-0' />  : <img src="public\image\walk.webp" alt="" className='w-auto m-0 p-0 dragged' />}
           </div>
         })
        }
@@ -145,7 +145,7 @@ const moveAndEat = () => {
     <div ref={gameAreaRef}  className="w-4/5 mx-auto flex justify-around animationArea">
           <div className='character'>
         <div onAnimationEnd={() => alert('animation end')} ref={emojiRef} className="w-24">
-          <img src="src\assets\image\ind.webp" alt="" className='w-full h-auto' />
+          <img src="public\image\ind.webp" alt="" className='w-full h-auto' />
         </div>
       </div>
       <div className="dot w-6 h-6 rounded-full bg-black self-end"></div>
