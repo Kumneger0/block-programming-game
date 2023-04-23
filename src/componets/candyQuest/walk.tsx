@@ -1,5 +1,5 @@
 import './walk.css'
-import  { DragEventHandler, useRef, useState, useContext } from "react"
+import  { DragEventHandler, useRef, useState, useContext, useEffect } from "react"
 import { levelcontext } from '../dashboad'
 import { ModalPart } from '../modal/modal'
 import {AiOutlinePlayCircle} from 'react-icons/ai'
@@ -12,6 +12,7 @@ export type GameStatus = {text:string | null; type:'fail' | 'seccuss'}
 function Walk() {
   const {level, setLevel} = useContext(levelcontext)
   const [isOpen, setIsOpen] = useState(false);
+  const [Dots, setDots] = useState<any[]>([]);
   const [numberOfrequiredAnimation, setnumberOfrequiredAnimation] = useState<number>(2);
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
@@ -113,6 +114,21 @@ function animate(item :number, isLast:boolean) {
     }
 }
 
+
+
+
+
+
+useEffect(() => {
+  if(level ==1){
+    setDots([1, 2])
+  }
+  if(level == 2){
+    setDots([1, 2, 3, 4])
+    setnumberOfrequiredAnimation(4)
+  }
+}, [])
+
   return (
     <div className='w-screen playArea h-screen' onDragOver={(e) => e.preventDefault()} onDrop={() => deleteRef.current?.classList.add('invisible')}>
 
@@ -161,8 +177,8 @@ function animate(item :number, isLast:boolean) {
           <img src="public\image\ind.webp" alt="" className='w-full h-auto' />
         </div>
       </div>
-      <div className="dot w-6 h-6 rounded-full bg-black self-end"></div>
-      <div className="dot w-6 h-6 rounded-full bg-black self-end"></div>
+      {Dots.length > 0 && Dots.map( () => <div className="dot w-6 h-6 rounded-full bg-black self-end"></div> )
+    }
       <div className="w-1/2">
         <button ref={gumRef} className="border bg-red-400 -ml-16 gum">gum</button>
       </div>

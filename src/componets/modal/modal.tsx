@@ -19,7 +19,8 @@ const closeAndReplay = () => {
 }
 
 const loadNextLesson = () => {
-  setLevel((prv:number) => prv + 1)
+  flushSync(() =>  setLevel(0))
+  setLevel((prv:number) => prv + 2)
   onClose()
 }
   return (
