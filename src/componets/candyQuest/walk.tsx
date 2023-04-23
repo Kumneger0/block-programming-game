@@ -1,12 +1,20 @@
 import './walk.css'
 import  { DragEventHandler, useRef, useState } from "react"
+import { ModalPart } from '../modal/modal'
 import {AiOutlinePlayCircle} from 'react-icons/ai'
 import {RiDeleteBinFill} from 'react-icons/ri'
 
 type Program = { text: string; style: string | null }
+export type GameStatus = {text:string | null; type:'fail' | 'seccuss'}
 
 
 function Walk() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const openModal = () => setIsOpen(true);
+  const closeModal = () => setIsOpen(false);
+  const [gameStatus, setGameStatus] = useState< GameStatus>({text:null, type:'seccuss'});
+
   const dragItemsParent = useRef<HTMLDivElement>(null);
   const emojiRef = useRef<HTMLDivElement>(null)
   const gumRef = useRef<HTMLButtonElement>(null)
@@ -42,7 +50,6 @@ function Walk() {
         const text = dragedItemRef.current?.innerText as string
         const temp = [...program]
         temp.push({text, style:null})
-        console.log(text)
         setProgram(temp)
     
   };
@@ -51,59 +58,56 @@ const deleteItem = () => {
   const temp = [...program].filter((_program, i) => i !== deleteIndex)
   setProgram(temp)
 }
-
-
-const moveAndEat = () => {
-  if(program.length == 1 && program[0].text == 'onstart') return
-  const length = program.length
-  const destination= gameAreaRef.current?.childNodes
-  const emojiDOMRect = emojiRef.current?.getBoundingClientRect()
-  let diffrence;
-  if(length == 2){
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    destinationRef.current = destination[1]
-    const gumDOMRect = destinationRef.current?.getBoundingClientRect()
-       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-  diffrence = (gumDOMRect.x - emojiDOMRect.x) - 50
-  }
-  if(length == 3){
-       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    destinationRef.current = destination[3]
-    const gumDOMRect = destinationRef.current?.getBoundingClientRect()
-       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    diffrence = (gumDOMRect.x - emojiDOMRect.x) - 150
-  }
-  if(length >= 4){
-    diffrence = 600
-  }
-  emojiRef.current?.animate([{transform:`translateX(0)px`}, {transform:`translateX(${diffrence}px)`}], {
-    duration: 2000,
-    iterations: 1,
-    fill:'forwards'
+const initialEmojiDomRect = emojiRef.current?.getBoundingClientRect()
+const startMoving = () => {
+  program.forEach(async(program, i) => {
+   const animation = emojiRef.current?.getAnimations()
+   if(!animation?.length){
+     if(i == 1){
+       animate(i, false)
+     }
+     return
+   }else{
+    animation.map(animation => animation.finished.then(res => {
+      if(i == 2){
+        animate(i, true)
+      }
+    }))
+   }
   })
- const animation = emojiRef.current?.getAnimations().map(animation => animation.finished.then(res => {
-    if(length == 2){
-      setGameOver(true)
-      return res
+}
+let diffrence = 0
+function animate(item :number, isLast:boolean) {
+  const emojiDOMRect = emojiRef.current?.getBoundingClientRect()
+  const childrens = gameAreaRef.current?.childNodes
+  const destination = childrens[item].getBoundingClientRect()
+   destinationRef.current = childrens[item];
+  diffrence += destination.x - emojiDOMRect.x
+  console.log(diffrence)
+   emojiRef.current?.animate([{transform:`translateX(${0})px`}, {transform:`translateX(${diffrence}px)`}], {
+      duration: 1000,
+      iterations: 1,
+      fill:'forwards',
+     })
+    const currentEmojiDOMRect = emojiRef.current?.getBoundingClientRect()
+    const animations = emojiRef.current?.getAnimations()
+    if(animations?.length >= 2){
+    animations[animations?.length - 1].finished.then(res=> {
+      setTimeout(() => {
+       gumRef.current.style.display = 'none'
+       setTimeout(() => {
+        setGameStatus({text:"you are seccussfully finished", type:'seccuss'})
+          setIsOpen(true)
+       }, 500)
+      }, 500)
+    })
     }
-    if(length >= 4){
-       setGameOver(true)
-      return
-    }
-    if(gumRef.current){
-      gumRef.current.style.display = 'none'
-    }
- }))
- console.log(animation)
 }
 
   return (
     <div className='w-screen playArea h-screen' onDragOver={(e) => e.preventDefault()} onDrop={() => deleteRef.current?.classList.add('invisible')}>
 
+      {gameStatus.text && <ModalPart isOpen={isOpen} onClose={closeModal} gameStatus={gameStatus} /> }
     <div className="w-4/5 h-auto flex mx-auto flex-wrap justify-center responsive">
       <div ref={deleteRef}  onDrop = {deleteItem} onDragOver={handleDragOver} className="delete w-48 h-full bg-slate-50 absolute left-0 flex justify-center items-center invisible">
         <div className='w-9'>
@@ -136,7 +140,7 @@ const moveAndEat = () => {
                //@ts-ignore
             dragedItemRef.current = e.target
           }} draggable = {i !== 0 ? true : false}  key={i} className="w-24 -m-2 overflow-x-hidden dragged">
-            {text == 'onstart' ? <img src="public\image\onstart.png" alt="" className='w-auto m-0 p-0' />  : <img src="public\image\walk.webp" alt="" className='w-auto m-0 p-0 dragged' />}
+            {text == 'onstart' ? <img src="public\image\onstart.png" alt="" className='w-auto m-0 p-0' />  : <img src="public\image\walk.webp" alt="" className='w-auto m-0 p-0 dragged border-2 border-white' />}
           </div>
         })
        }
@@ -155,7 +159,7 @@ const moveAndEat = () => {
       </div>
       </div>
     <div className="playBTN fixed bottom-0 right-24 w-9 p-8">
-      <div role='button' onClick={moveAndEat} className='playBtn w-full hover:cursor-pointer'>
+      <div role='button' onClick={startMoving} className='playBtn w-full hover:cursor-pointer'>
         <AiOutlinePlayCircle className='w-24 h-24 '  />
       </div>
     </div>

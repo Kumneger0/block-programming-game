@@ -1,5 +1,11 @@
 import styles from './dashboard.module.css'
 import {useState} from 'react'
+import {
+  SignedIn,
+  UserButton,
+  useUser,
+  RedirectToSignIn,
+} from "@clerk/clerk-react";
 import Walk from '../candyQuest/walk'
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState<boolean>(false)

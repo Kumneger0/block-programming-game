@@ -1,4 +1,5 @@
 import './header.css'
+import Modal from '../modal/modal'
 export default function Header() {
   return (
  <header className='bg-amber-400'>

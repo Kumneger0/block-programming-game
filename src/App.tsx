@@ -4,6 +4,11 @@ import Auth from './componets/Auth';
 import Dashboard from './componets/dashboad';
 import { useState, createContext } from 'react';
 
+
+
+
+
+
 export type User = {
   name: string, 
   email: string,
