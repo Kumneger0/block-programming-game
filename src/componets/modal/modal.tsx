@@ -1,4 +1,6 @@
-import  {useState} from 'react';
+import  {useState, useContext} from 'react';
+import { flushSync } from 'react-dom';
+import { levelcontext } from '../dashboad';
 import type { GameStatus } from '../candyQuest/walk';
 
 export const ModalPart = ({ isOpen, onClose, gameStatus }:{
@@ -6,8 +8,20 @@ isOpen: boolean
 onClose:() => void;
 gameStatus:GameStatus;
 }) => {
+  const {setLevel} = useContext(levelcontext)
+
   if (!isOpen) return null;
 
+const closeAndReplay = () => {
+  flushSync(() =>  setLevel(0))
+  setLevel(1)
+  onClose()
+}
+
+const loadNextLesson = () => {
+  setLevel((prv:number) => prv + 1)
+  onClose()
+}
   return (
     <div className="fixed z-10 inset-0 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen">
@@ -22,7 +36,7 @@ gameStatus:GameStatus;
             <button
               type="button"
               className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500"
-              onClick={onClose}
+              onClick={closeAndReplay}
             >
               replay
             </button>
@@ -30,7 +44,7 @@ gameStatus:GameStatus;
             <button
               type="button"
               className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 ml-4"
-              onClick={onClose}
+              onClick={loadNextLesson}
             >
               next lessons
             </button>

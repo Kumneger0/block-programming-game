@@ -1,5 +1,6 @@
 import './walk.css'
-import  { DragEventHandler, useRef, useState } from "react"
+import  { DragEventHandler, useRef, useState, useContext } from "react"
+import { levelcontext } from '../dashboad'
 import { ModalPart } from '../modal/modal'
 import {AiOutlinePlayCircle} from 'react-icons/ai'
 import {RiDeleteBinFill} from 'react-icons/ri'
@@ -9,8 +10,9 @@ export type GameStatus = {text:string | null; type:'fail' | 'seccuss'}
 
 
 function Walk() {
+  const {level, setLevel} = useContext(levelcontext)
   const [isOpen, setIsOpen] = useState(false);
-
+  const [numberOfrequiredAnimation, setnumberOfrequiredAnimation] = useState<number>(2);
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
   const [gameStatus, setGameStatus] = useState< GameStatus>({text:null, type:'seccuss'});
@@ -58,7 +60,6 @@ const deleteItem = () => {
   const temp = [...program].filter((_program, i) => i !== deleteIndex)
   setProgram(temp)
 }
-const initialEmojiDomRect = emojiRef.current?.getBoundingClientRect()
 const startMoving = () => {
   program.forEach(async(program, i) => {
    const animation = emojiRef.current?.getAnimations()
@@ -67,7 +68,8 @@ const startMoving = () => {
        animate(i, false)
      }
      return
-   }else{
+   }
+   else{
     animation.map(animation => animation.finished.then(res => {
       if(i == 2){
         animate(i, true)
@@ -83,7 +85,6 @@ function animate(item :number, isLast:boolean) {
   const destination = childrens[item].getBoundingClientRect()
    destinationRef.current = childrens[item];
   diffrence += destination.x - emojiDOMRect.x
-  console.log(diffrence)
    emojiRef.current?.animate([{transform:`translateX(${0})px`}, {transform:`translateX(${diffrence}px)`}], {
       duration: 1000,
       iterations: 1,
@@ -101,6 +102,14 @@ function animate(item :number, isLast:boolean) {
        }, 500)
       }, 500)
     })
+    }
+
+    if(numberOfrequiredAnimation > program.length -1){
+    const  animations =  emojiRef.current?.getAnimations()
+    animations?.map((animation) => animation.finished.then(res => {
+      setGameStatus({text:"Try Connecting one or more walk blocks", type:'fail'})
+      setIsOpen(true)
+    }))
     }
 }
 

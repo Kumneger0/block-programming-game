@@ -2,6 +2,7 @@ import styles from './auth.module.css'
 import { useContext } from 'react'
 import { userContext } from '../../App'
 import {
+  SignInButton,
   SignedIn,
   SignedOut,
   UserButton,
@@ -33,7 +34,7 @@ const singUpUser = () => {
         <div>Learn coding by collecting candies</div>
       </div>
       <div className="authentication flex w-full h-full justify-center items-center flex-col gap-2">
-       <button onClick={singInUser} className='border-2 border-red-300 bg-blue-600 p-2 hover:bg-blue-800 text-white'><SignedIn /></button>
+       <button onClick={singInUser} className='border-2 border-red-300 bg-blue-600 p-2 hover:bg-blue-800 text-white'><SignInButton redirectUrl='http://localhost:5173' mode='modal' /></button>
        <div>Or</div>
        <button onClick={singUpUser} className='border-2  border-red-300 text-white bg-blue-800 p-2 hover:bg-blue-400'>Sign Up</button>
       </div>
