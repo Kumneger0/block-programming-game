@@ -1,18 +1,20 @@
 import styles from './dashboard.module.css'
 import {useState, createContext} from 'react'
 import Walk from '../candyQuest/walk'
+import {useClerk, UserButton} from "@clerk/clerk-react";
+
 
 export interface ILevel {
-  level: number;
-  setLevel:(value:number)=> void;
+  level: number | null;
+  setLevel:(value:number | ((prv : number) => number))=> void;
 }
-export const levelcontext = createContext<ILevel | null>(null)
+export const levelcontext = createContext<Partial<ILevel>>({level:null})
 
 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [level, setLevel] = useState<number>(0)
-
+  const {signOut} = useClerk()
 
 const playGame = async (level:number) => {
   setIsLoading(true)
@@ -35,7 +37,10 @@ const playGame = async (level:number) => {
         <div className="circle w-24 h-24 rounded-full bg-black sm:w-16 sm:h-16"></div>
         <div className="circle w-24 h-24 rounded-full bg-black sm:w-16 sm:h-16"></div>
         </div>
-        <div className='w-16 h-16 rounded-full bg-slate-200 text-center'>hello</div>
+        <div>
+          {/* <button onClick={() => signOut()}>signOut</button> */}
+          <UserButton />
+        </div>
        </div>
        <div className='w-4/5 sm:w-11/12 flex justify-around mx-auto mt-4 items-center h-1/2 sm:flex-col sm:justify-center'>
         <div>image</div>

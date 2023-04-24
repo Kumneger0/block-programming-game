@@ -4,14 +4,26 @@ import { levelcontext } from '../dashboad'
 import { ModalPart } from '../modal/modal'
 import {AiOutlinePlayCircle} from 'react-icons/ai'
 import {RiDeleteBinFill} from 'react-icons/ri'
+import { flushSync } from 'react-dom'
 
 type Program = { text: string; style: string | null }
 export type GameStatus = {text:string | null; type:'fail' | 'seccuss'}
 
 
+
+const images = [
+  "src\\images\\walking\\535ed2d984aafa0b43000085.webp",
+  "src\\images\\walking\\535ed2d984aafa0443000074.webp",
+  "src\\images\\walking\\535ed2d984aafa0643000072.webp",
+  "src\\images\\walking\\535ed2d984aafaae4300004b.webp",
+  "src\\images\\walking\\535ed2d984aafaf742000075.webp"
+]
+
+
 function Walk() {
   const {level, setLevel} = useContext(levelcontext)
   const [isOpen, setIsOpen] = useState(false);
+  const blockesRef = useRef<HTMLDivElement[]>([])
   const [Dots, setDots] = useState<any[]>([]);
   const [numberOfrequiredAnimation, setnumberOfrequiredAnimation] = useState<number>(2);
   const openModal = () => setIsOpen(true);
@@ -19,6 +31,7 @@ function Walk() {
   const [gameStatus, setGameStatus] = useState< GameStatus>({text:null, type:'seccuss'});
 
   const dragItemsParent = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLImageElement>()
   const emojiRef = useRef<HTMLDivElement>(null)
   const gumRef = useRef<HTMLButtonElement>(null)
   const dragedItemRef = useRef<HTMLElement>(null);
@@ -61,20 +74,24 @@ const deleteItem = () => {
   const temp = [...program].filter((_program, i) => i !== deleteIndex)
   setProgram(temp)
 }
+let initialEmojiDOMRect 
 const startMoving = () => {
-  program.forEach(async(program, i) => {
+  initialEmojiDOMRect = emojiRef.current.getBoundingClientRect()
+  program.forEach(async(program, i, arr) => {
    const animation = emojiRef.current?.getAnimations()
    if(!animation?.length){
      if(i == 1){
-       animate(i, false)
+     blockesRef.current[i].childNodes[0].classList.add('border-2')
+     flushSync(() => animate(i, false))  
+     blockesRef.current[i].childNodes[0].classList.remove('border-2')
      }
      return
    }
    else{
     animation.map(animation => animation.finished.then(res => {
-      if(i == 2){
-        animate(i, true)
-      }
+     addStyle(i, 'ADD')
+     flushSync(() => animate(i, arr.length - 1 == i))
+     addStyle(i, 'REMOVE')
     }))
    }
   })
@@ -85,14 +102,21 @@ function animate(item :number, isLast:boolean) {
   const childrens = gameAreaRef.current?.childNodes
   const destination = childrens[item].getBoundingClientRect()
    destinationRef.current = childrens[item];
-  diffrence += destination.x - emojiDOMRect.x
+   diffrence = destination.x - initialEmojiDOMRect.x
+   console.log(diffrence)
    emojiRef.current?.animate([{transform:`translateX(${0})px`}, {transform:`translateX(${diffrence}px)`}], {
-      duration: 1000,
+      duration: 1000 * item,
       iterations: 1,
       fill:'forwards',
      })
+     addStyle(item, 'ADD')
     const currentEmojiDOMRect = emojiRef.current?.getBoundingClientRect()
     const animations = emojiRef.current?.getAnimations()
+    let isActive = false
+    animations?.forEach(async(animation, i) => {
+      if(!i) return
+      if(isActive) await animation.finished;
+    })
     if(animations?.length >= 2){
     animations[animations?.length - 1].finished.then(res=> {
       setTimeout(() => {
@@ -100,7 +124,7 @@ function animate(item :number, isLast:boolean) {
        setTimeout(() => {
         setGameStatus({text:"you are seccussfully finished", type:'seccuss'})
           setIsOpen(true)
-       }, 500)
+       }, 1000)
       }, 500)
     })
     }
@@ -112,22 +136,36 @@ function animate(item :number, isLast:boolean) {
       setIsOpen(true)
     }))
     }
+    emojiRef.current?.getAnimations().forEach((animation, i) => {
+      let interval = setInterval(() => {
+        if(!imageRef.current?.src) return
+        imageRef.current.src = images[Math.floor(Math.random() * images.length)]
+      }, 200)
+       animation.finished(() => {
+        clearInterval(interval)
+       })
+    })
 }
 
-
-
-
-
-
+const addStyle = (index:number, status:'ADD' | 'REMOVE') => {
+  console.log(index, 'index', )
+if(status == 'ADD'){
+  const childs = blockesRef.current[index].childNodes[0]
+  childs.classList.add('border-2')
+  return true
+}
+  const childs = blockesRef.current[index].childNodes[0]
+  childs.classList.remove('border-2')
+  return false
+}
 useEffect(() => {
   if(level ==1){
     setDots([1, 2])
   }
   if(level == 2){
     setDots([1, 2, 3, 4])
-    setnumberOfrequiredAnimation(4)
   }
-}, [])
+}, [level])
 
   return (
     <div className='w-screen playArea h-screen' onDragOver={(e) => e.preventDefault()} onDrop={() => deleteRef.current?.classList.add('invisible')}>
@@ -158,14 +196,14 @@ useEffect(() => {
        {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         program.map(({text}:{text:string, style:string | null}, i:number) => {
-          return <div onDragStart={(e) => {
+          return <div ref={(el) => blockesRef.current[i] = el} onDragStart={(e) => {
             deleteRef.current?.classList.remove('invisible')
             setDeleteIndex(i)
                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                //@ts-ignore
             dragedItemRef.current = e.target
           }} draggable = {i !== 0 ? true : false}  key={i} className="w-24 -m-2 overflow-x-hidden dragged">
-            {text == 'onstart' ? <img src="public\image\onstart.png" alt="" className='w-auto m-0 p-0' />  : <img src="public\image\walk.webp" alt="" className='w-auto m-0 p-0 dragged border-2 border-white' />}
+            {text == 'onstart' ? <img src="public\image\onstart.png" alt="" className='w-auto m-0 p-0' />  : <img src="public\image\walk.webp" alt="" className='w-auto m-0 p-0 dragged  border-white' />}
           </div>
         })
        }
@@ -174,7 +212,7 @@ useEffect(() => {
     <div ref={gameAreaRef}  className="w-4/5 mx-auto flex justify-around animationArea">
           <div className='character'>
         <div onAnimationEnd={() => alert('animation end')} ref={emojiRef} className="w-24">
-          <img src="public\image\ind.webp" alt="" className='w-full h-auto' />
+          <img ref={imageRef} src="src\images\walking\index.webp" alt="" className='w-full h-auto' />
         </div>
       </div>
       {Dots.length > 0 && Dots.map( () => <div className="dot w-6 h-6 rounded-full bg-black self-end"></div> )

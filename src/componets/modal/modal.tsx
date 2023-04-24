@@ -1,4 +1,5 @@
-import  {useState, useContext} from 'react';
+import  { useContext} from 'react';
+import type { ILevel } from '../dashboad';
 import { flushSync } from 'react-dom';
 import { levelcontext } from '../dashboad';
 import type { GameStatus } from '../candyQuest/walk';
@@ -8,18 +9,20 @@ isOpen: boolean
 onClose:() => void;
 gameStatus:GameStatus;
 }) => {
-  const {setLevel} = useContext(levelcontext)
+  const {level, setLevel} = useContext<ILevel>(levelcontext)
 
-  if (!isOpen) return null;
+if (!isOpen) return null;
 
 const closeAndReplay = () => {
   flushSync(() =>  setLevel(0))
-  setLevel(1)
+  setLevel((prv) => prv = level as number)
   onClose()
 }
 
 const loadNextLesson = () => {
-  flushSync(() =>  setLevel(0))
+  flushSync(() =>  setLevel(prv => {
+    return prv - 1
+  }))
   setLevel((prv:number) => prv + 2)
   onClose()
 }
