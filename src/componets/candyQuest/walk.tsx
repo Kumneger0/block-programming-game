@@ -13,6 +13,16 @@ import { flushSync } from 'react-dom'
 
 type Program = { text: string; style: string | null }
 export type GameStatus = {text:string | null; type:'fail' | 'seccuss'}
+const eating = import.meta.glob('../../assets/Eating/*')
+const imagesEating:string[] = []
+Object.keys(eating).forEach(key => {
+  eating[key]().then((res) => {
+    //@ts-expect-error b/c no types available
+    const path = res.default
+    imagesEating.push(path)
+  })
+})
+
 const allimages = import.meta.glob('../../assets/images/walking/*')
 const images:string[] = []
 Object.keys(allimages).forEach(key => {
@@ -122,17 +132,19 @@ function animate(item :number) {
     animations[animeLength - 1].finished.then(() => {
       setTimeout(() => {
         if(gumRef.current !== null){
-          gumRef.current.style.display = 'none'
           setTimeout(() => {
-           setGameStatus({text:"you are seccussfully finished", type:'seccuss'})
-             setIsOpen(true)
+          gumRef.current.style.display = 'none'
+             setTimeout(() => {
+              setGameStatus({text:"you are seccussfully finished", type:'seccuss'})
+              setIsOpen(true)
+             }, 500)
           }, 1000)
         }
-      }, 500)
+      }, 1000)
     })
     }
 
-    if(numberOfrequiredAnimation > program.length -1){
+    if(numberOfrequiredAnimation > program.length - 1){
     const  animations =  emojiRef.current?.getAnimations()
     animations?.map((animation) => animation.finished.then(() => {
       setGameStatus({text:"Try Connecting one or more walk blocks", type:'fail'})

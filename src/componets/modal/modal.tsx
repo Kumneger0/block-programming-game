@@ -37,7 +37,7 @@ const loadNextLesson = () => {
 
         <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
           <div className="px-4 py-5 sm:p-6">
-            <h2 className="text-xl font-bold mb-4">Secusses</h2>
+            <h2 className="text-xl font-bold mb-4">{gameStatus.type == 'seccuss' ? 'secussesfully finished' : 'OOPS'}</h2>
             <p className="mb-4">{gameStatus.text}</p>
             <button
               type="button"
