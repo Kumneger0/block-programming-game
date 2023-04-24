@@ -37,6 +37,7 @@ function Walk() {
   const {level } = useContext(levelcontext)
   const [isOpen, setIsOpen] = useState(false);
   const blockesRef = useRef<HTMLDivElement[]>([])
+  const [gameOver, setGameOver] = useState<boolean>(false)
   const [gumPosition, setGumPosition] = useState<{top:number | null, left:number | null}>({top:null, left:null})
   const [Dots, setDots] = useState<number[]>([]);
   const [numberOfrequiredAnimation, setnumberOfrequiredAnimation] = useState<number>(2);
@@ -67,12 +68,10 @@ function Walk() {
   };
   
   useEffect(() => {
-    if(gameAreaRef.current){
-      const childrens = gameAreaRef.current.childNodes as  NodeListOf<HTMLElement>
-      const targetPlace = childrens[childrens.length - 2].getBoundingClientRect()
-     setGumPosition({top: targetPlace.top, left: targetPlace.left})
-    }
-  }, [])
+   if(gameStatus.type == 'fail'){
+    setIsOpen(true)
+   }
+  }, [gameStatus.type, gameStatus.text])
 
   const dropItem:DragEventHandler  = (e) => {
     e.preventDefault();
@@ -112,6 +111,13 @@ const startMoving = () => {
 let diffrence = 0
 function animate(item :number) {
   const childrens = gameAreaRef.current?.childNodes as NodeListOf<Element>
+  if(!childrens[item]){
+    emojiRef.current?.getAnimations().map((anim) => anim.finish())
+    flushSync(() => {
+      setGameOver(true)
+    })
+    return
+  }
   const destination = childrens[item].getBoundingClientRect()
    destinationRef.current = childrens[item] as HTMLDivElement;
    diffrence = destination.x - initialEmojiDOMRect.x
@@ -122,6 +128,7 @@ function animate(item :number) {
      })
      addStyle(item, 'ADD')
     const animations = emojiRef.current?.getAnimations() as Animation[]
+  
     const isActive = false
     animations?.forEach(async(animation, i) => {
       if(!i) return
