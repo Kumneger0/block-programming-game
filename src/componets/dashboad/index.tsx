@@ -1,7 +1,7 @@
 import styles from './dashboard.module.css'
 import {useState, createContext} from 'react'
 import Walk from '../candyQuest/walk'
-import {useClerk, UserButton} from "@clerk/clerk-react";
+import {UserButton} from "@clerk/clerk-react";
 
 
 export interface ILevel {
@@ -14,7 +14,7 @@ export const levelcontext = createContext<Partial<ILevel>>({level:null})
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [level, setLevel] = useState<number>(0)
-  const {signOut} = useClerk()
+
 
 const playGame = async (level:number) => {
   setIsLoading(true)

@@ -9,13 +9,15 @@ isOpen: boolean
 onClose:() => void;
 gameStatus:GameStatus;
 }) => {
+
+  //@ts-expect-error jkah
   const {level, setLevel} = useContext<ILevel>(levelcontext)
 
 if (!isOpen) return null;
 
 const closeAndReplay = () => {
   flushSync(() =>  setLevel(0))
-  setLevel((prv) => prv = level as number)
+  setLevel(() => level as number)
   onClose()
 }
 
