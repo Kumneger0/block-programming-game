@@ -133,6 +133,7 @@ function animate(item :number) {
       setTimeout(() => {
         if(gumRef.current !== null){
           setTimeout(() => {
+          if(gumRef.current == null) return
           gumRef.current.style.display = 'none'
              setTimeout(() => {
               setGameStatus({text:"you are seccussfully finished", type:'seccuss'})

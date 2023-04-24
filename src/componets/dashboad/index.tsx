@@ -2,6 +2,7 @@ import styles from './dashboard.module.css'
 import {useState, createContext} from 'react'
 import Walk from '../candyQuest/walk'
 import {UserButton} from "@clerk/clerk-react";
+import Loading from '../../Loading/loading';
 
 
 export interface ILevel {
@@ -29,7 +30,7 @@ const playGame = async (level:number) => {
 }
 
   return (
-    <>{ level  ?  isLoading ? "please wailt..." : <levelcontext.Provider value={{level, setLevel}}> <Walk /></levelcontext.Provider> :
+    <>{ level  ?  isLoading ? <Loading /> : <levelcontext.Provider value={{level, setLevel}}> <Walk /></levelcontext.Provider> :
     <div className={`${styles.container} w-screen h-screen`}>
        <div className = {`w-4/5 mx-auto sm:w-11/12 flex mt-2 justify-between`}>
         <div className='flex gap-2'>

@@ -1,10 +1,8 @@
 .playArea{
     background: #F0C27B;  
     background: -webkit-linear-gradient(to right, #4B1248, #F0C27B);  
-    background: linear-gradient(to right, #4B1248, #F0C27B); 
+    background: linear-gradient(to right, rgb(75, 18, 72), #F0C27B); 
 }
-
-
 
 .emoji{
     width: 100px;
