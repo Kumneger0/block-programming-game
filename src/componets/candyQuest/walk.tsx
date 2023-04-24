@@ -9,7 +9,6 @@ import { levelcontext } from '../dashboad'
 import { ModalPart } from '../modal/modal'
 import {AiOutlinePlayCircle} from 'react-icons/ai'
 import {RiDeleteBinFill} from 'react-icons/ri'
-import { flushSync } from 'react-dom'
 
 type Program = { text: string; style: string | null }
 export type GameStatus = {text:string | null; type:'fail' | 'seccuss'}
@@ -86,107 +85,58 @@ const deleteItem = () => {
   const temp = [...program].filter((_program, i) => i !== deleteIndex)
   setProgram(temp)
 }
-let initialEmojiDOMRect: DOMRect 
-const startMoving = () => {
-  if(emojiRef.current !== null){
-   initialEmojiDOMRect = emojiRef.current.getBoundingClientRect()
-  }
-  program.forEach(async(_program, i) => {
-   const animation = emojiRef.current?.getAnimations()
-   if(!animation?.length){
-     if(i == 1){
-     flushSync(() => animate(i))  
-     }
+
+const targetNodePostions:{ele:number, x:number}[] = [];
+function startMoving(){
+  if(program.length <= 1) return
+  const childs = gameAreaRef.current?.childNodes as NodeListOf<HTMLElement>
+  const targetRect = childs[numberOfrequiredAnimation].getBoundingClientRect().x
+  
+  childs.forEach((child, i) => {
+    if(i == 0) return
+    targetNodePostions.push({ele:i, x:child.getBoundingClientRect().x})
+  })
+  const emojiDOMRECT = emojiRef.current?.getBoundingClientRect() as  DOMRect
+  const destination = childs[program.length - 1].getBoundingClientRect()
+  const diffrence = destination.x - emojiDOMRECT.x
+  console.log(targetRect - emojiDOMRECT.x, diffrence)
+  if((targetRect - emojiDOMRECT.x) == diffrence){
+     applyAnimation(diffrence - 30, 2000)
      return
-   }
-   else{
-    animation.map(animation => animation.finished.then(() => {
-     addStyle(i, 'ADD')
-     flushSync(() => animate(i))
-     addStyle(i, 'REMOVE')
-    }))
-   }
+  }
+  applyAnimation(diffrence - 30, 1000)
+}
+
+
+function applyAnimation(diffrence:number, duration:number){
+  emojiRef.current?.animate([{transform: `translateX(${0})`}, {transform: `translateX(${diffrence}px)`}],{duration, fill:'forwards'})
+  emojiRef.current?.getAnimations().forEach(animation => {
+    let idx = 0
+   const interval1 = setInterval(() => {
+    if(images.length - 1 <= idx){
+      idx = 0
+    }
+    ++idx 
+   if(imageRef.current === null) return
+   
+   imageRef.current.src = images[idx]
+    }, 100)
+    animation.finished.then(() =>{
+      clearInterval(interval1)
+      let idx = 0 
+      const interval = setInterval(() => {
+          if(imagesEating.length <= idx){
+            idx = 0
+          }
+          ++idx
+         if(imageRef.current === null) return
+          imageRef.current.src = imagesEating[idx]
+      }, 100)
+      setTimeout(() => clearInterval(interval),300)
+    })
   })
 }
-let diffrence = 0
-function animate(item :number) {
-  const childrens = gameAreaRef.current?.childNodes as NodeListOf<Element>
-  if(!childrens[item]){
-    emojiRef.current?.getAnimations().map((anim) => anim.finish())
-    flushSync(() => {
-      setGameOver(true)
-    })
-    return
-  }
-  const destination = childrens[item].getBoundingClientRect()
-   destinationRef.current = childrens[item] as HTMLDivElement;
-   diffrence = destination.x - initialEmojiDOMRect.x
-   emojiRef.current?.animate([{transform:`translateX(${0})px`}, {transform:`translateX(${diffrence}px)`}], {
-      duration: 1000 * item,
-      iterations: 1,
-      fill:'forwards',
-     })
-     addStyle(item, 'ADD')
-    const animations = emojiRef.current?.getAnimations() as Animation[]
-  
-    const isActive = false
-    animations?.forEach(async(animation, i) => {
-      if(!i) return
-      if(isActive) await animation.finished;
-    })
-    const animeLength = animations?.length ?? 0
-    if(animeLength >= 2){
-    animations[animeLength - 1].finished.then(() => {
-      setTimeout(() => {
-        if(gumRef.current !== null){
-          setTimeout(() => {
-          if(gumRef.current == null) return
-          gumRef.current.style.display = 'none'
-             setTimeout(() => {
-              setGameStatus({text:"you are seccussfully finished", type:'seccuss'})
-              setIsOpen(true)
-             }, 500)
-          }, 1000)
-        }
-      }, 1000)
-    })
-    }
 
-    if(numberOfrequiredAnimation > program.length - 1){
-    const  animations =  emojiRef.current?.getAnimations()
-    animations?.map((animation) => animation.finished.then(() => {
-      setGameStatus({text:"Try Connecting one or more walk blocks", type:'fail'})
-      setIsOpen(true)
-    }))
-    }
-    emojiRef.current?.getAnimations().forEach((animation) => {
-      let idx = 0
-      const interval = setInterval(() => {    
-        if(idx < images.length){
-          ++idx
-        }
-        else{
-          idx = 0
-        }
-        if(!imageRef.current?.src) return
-        imageRef.current.src = images[idx]
-      }, 200)
-       animation.finished.then(() => {
-        clearInterval(interval)
-       })
-    })
-}
-
-const addStyle = (index:number, status:'ADD' | 'REMOVE') => {
-if(status == 'ADD'){
-  const childs = blockesRef.current[index].childNodes[0] as HTMLImageElement
-  childs.classList.add('border-2')
-  return true
-}
-  const childs = blockesRef.current[index].childNodes[0] as HTMLImageElement
-  childs.classList.remove('border-2')
-  return false
-}
 useEffect(() => {
   if(level ==1){
     setDots([1, 2])
