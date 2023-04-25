@@ -1,18 +1,21 @@
-import './walk.css'
-import onstart from '../../assets/image/onstart.png'
-import gum from   '../../assets/image/54650f8684aafa0d7d00004c.webp'
-import walk from '../../assets/image/walk.webp'
-import emoji from '../../assets/images/walking/index.webp'
-import shadow from '../../assets/image/535805e584aafa4e55000016.webp'
+import './jump.css'
+import onstart from '../../../assets/image/onstart.png'
+import jump from   '../../../assets/image/jump.png'
+import obstackle from '../../../assets/image/obstackle.webp'
+import gum from   '../../../assets/image/54650f8684aafa0d7d00004c.webp'
+import walk from '../../../assets/image/walk.webp'
+import emoji from '../../../assets/images/walking/index.webp'
+import shadow from '../../../assets/image/535805e584aafa4e55000016.webp'
 import  { DragEventHandler, useRef, useState, useContext, useEffect } from "react"
-import { levelcontext } from '../dashboad'
-import { ModalPart } from '../modal/modal'
+import { levelcontext } from '../../dashboad'
+import { ModalPart } from '../../modal/modal'
 import {AiOutlinePlayCircle} from 'react-icons/ai'
 import {RiDeleteBinFill} from 'react-icons/ri'
+import { flushSync } from 'react-dom'
 
 type Program = { text: string; style: string | null }
 export type GameStatus = {text:string | null; type:'fail' | 'seccuss'}
-const eating = import.meta.glob('../../assets/Eating/*')
+const eating = import.meta.glob('../../../assets/Eating/*')
 const imagesEating:string[] = []
 Object.keys(eating).forEach(key => {
   eating[key]().then((res) => {
@@ -22,7 +25,7 @@ Object.keys(eating).forEach(key => {
   })
 })
 
-const allimages = import.meta.glob('../../assets/images/walking/*')
+const allimages = import.meta.glob('../../../assets/images/walking/*')
 const images:string[] = []
 Object.keys(allimages).forEach(key => {
   allimages[key]().then((res) => {
@@ -32,12 +35,10 @@ Object.keys(allimages).forEach(key => {
   })
 })
 
-function Walk() {
+function Jump():JSX.Element {
   const {level } = useContext(levelcontext)
   const [isOpen, setIsOpen] = useState(false);
   const blockesRef = useRef<HTMLDivElement[]>([])
-  const [gameOver, setGameOver] = useState<boolean>(false)
-  const [gumPosition, setGumPosition] = useState<{top:number | null, left:number | null}>({top:null, left:null})
   const [Dots, setDots] = useState<number[]>([]);
   const [numberOfrequiredAnimation, setnumberOfrequiredAnimation] = useState<number>(2);
   const closeModal = () => setIsOpen(false);
@@ -46,15 +47,19 @@ function Walk() {
   const dragItemsParent = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null)
   const emojiRef = useRef<HTMLDivElement>(null)
+  const [item, setItem] = useState<'jump' | 'walk' | null>(null)
   const gumRef = useRef<HTMLButtonElement>(null)
   const dragedItemRef = useRef<HTMLElement | null>(null);
   const deleteRef = useRef<HTMLDivElement>(null)
   const gameAreaRef = useRef<HTMLDivElement>(null)
-  const destinationRef = useRef<HTMLDivElement | null>(null)
   const [deleteIndex, setDeleteIndex]  = useState<number>()
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const [program, setProgram] = useState<Program[]>([{text:'onstart', style:null}]);
   const  dragItems:DragEventHandler = (e)  => {
+    const element = e.target as HTMLImageElement
+    const blockName = element.src.split('/').slice(-1)[0].split(".")[0] as 'jump' | 'walk'
+    console.log(blockName)
+    flushSync(() => setItem(blockName))
     dragedItemRef.current = e.target as HTMLElement
   }
 
@@ -75,9 +80,8 @@ function Walk() {
   const dropItem:DragEventHandler  = (e) => {
     e.preventDefault();
        if(dragedItemRef.current?.classList.contains('dragged')) return
-        const text = dragedItemRef.current?.innerText as string
         const temp = [...program]
-        temp.push({text, style:null})
+        temp.push({text:item as string, style:null})
         setProgram(temp)
   };
 
@@ -88,68 +92,36 @@ const deleteItem = () => {
 
 const targetNodePostions:{ele:number, x:number}[] = [];
 function startMoving(){
-  if(program.length <= 1) return
-  const childs = gameAreaRef.current?.childNodes as NodeListOf<HTMLElement>
-  const targetRect = childs[numberOfrequiredAnimation].getBoundingClientRect().x
-  
-  childs.forEach((child, i) => {
-    if(i == 0) return
-    targetNodePostions.push({ele:i, x:child.getBoundingClientRect().x})
-  })
-  const emojiDOMRECT = emojiRef.current?.getBoundingClientRect() as  DOMRect
-  const destination = childs[program.length - 1].getBoundingClientRect()
-  const targetPlace = childs[childs.length  - 2].getBoundingClientRect().x
-  const diffrence = destination.x - emojiDOMRECT.x
-  if((targetRect - emojiDOMRECT.x) == diffrence){
-    const isLast = Math.floor(targetPlace)  == Math.floor(destination.x)
-     applyAnimation(diffrence - 40, 2000, isLast)
-     return
-  }
-  applyAnimation(diffrence - 40, 1000, false)
+let emojiPosition = 0
+if(emojiRef.current){
+ emojiPosition = emojiRef.current.getBoundingClientRect().x
+}
+ const childs = gameAreaRef.current?.childNodes as NodeListOf<HTMLElement>
+ const startingElementToJump = childs[2].childNodes[0] as HTMLElement
+ const startingPositionToJump = startingElementToJump.getBoundingClientRect().x
+ const targetDestination = childs[childs.length - 2]
+ const targetPosition = targetDestination.getBoundingClientRect().x
+ const diffrence = startingPositionToJump - emojiPosition
+ applyAnimation(diffrence - 50)
 }
 
-
-function applyAnimation(diffrence:number, duration:number, isLast:boolean){
-  emojiRef.current?.animate([{transform: `translateX(${0})`}, {transform: `translateX(${diffrence}px)`}],{duration, fill:'forwards'})
-  emojiRef.current?.getAnimations().forEach(animation => {
-    let idx = 0
-   const interval1 = setInterval(() => {
-    if(images.length - 1 <= idx){
-      idx = 0
-    }
-    ++idx 
-   if(imageRef.current === null) return
-   
-   imageRef.current.src = images[idx]
-    }, 100)
-    animation.finished.then(() =>{
-      clearInterval(interval1)
-      if(isLast){
-        setGameStatus({text:'you are reached', type:'seccuss'})
-        setIsOpen(true)
-        return
-      }
-      setGameStatus({text:'you are failed', type:'fail'})
-      setIsOpen(true)
-    })
-  })
+function applyAnimation(diffrence:number){
+    emojiRef.current?.animate([{transform: `translateX(${diffrence}px)`},], {duration: 1000, fill: 'forwards'})
+    emojiRef.current?.getAnimations().forEach((animation) => animation.finished.then(() => {
+        // emojiRef.current?.animate([{transform: `translateY(${0}px)`},], {duration: 1000, fill: 'forwards'})
+    }))
 }
 
 useEffect(() => {
-  if(level ==1){
-    setDots([1, 2])
-  }
-  if(level == 2){
     setDots([1, 2, 3, 4])
     setnumberOfrequiredAnimation(4)
-  }
-}, [level])
+}, [])
 
   return (
     <div className='w-screen playArea h-screen' onDragOver={(e) => e.preventDefault()} onDrop={() => deleteRef.current?.classList.add('invisible')}>
 
       {gameStatus.text && <ModalPart isOpen={isOpen} onClose={closeModal} gameStatus={gameStatus} /> }
-    <div className="w-4/5 h-auto flex mx-auto flex-wrap justify-center responsive">
+    <div className="w-4/5 h-auto flex mx-auto flex-wrap justify-center responsive md:w-full">
       <div ref={deleteRef}  onDrop = {deleteItem} onDragOver={handleDragOver} className="delete w-48 h-full bg-slate-50 absolute left-0 flex justify-center items-center invisible">
         <div className='w-9'>
             <RiDeleteBinFill className = 'w-full h-auto' />
@@ -162,6 +134,11 @@ useEffect(() => {
           className="w-20"
         >
           <img src={walk} alt="" className='w-full' />
+        </button>
+        <button  draggable={true}
+          onDragStart={dragItems}
+          className="w-20">
+        <img src={jump} alt="" />
         </button>
       </div>
       <div
@@ -178,20 +155,21 @@ useEffect(() => {
             setDeleteIndex(i)
             dragedItemRef.current = e.target as HTMLElement
           }} draggable = {i !== 0 ? true : false}  key={i} className="w-24 -m-2 overflow-x-hidden dragged">
-            {text == 'onstart' ? <img src={onstart} alt="" className='w-auto m-0 p-0' />  : <img src={walk} alt="" className='w-auto m-0 p-0 dragged  border-white' />}
+            {text == 'onstart' ? <img src={onstart} alt="" className='w-auto m-0 p-0' />  :  <img src={text == 'walk' ? walk : jump} alt="" className='w-auto m-0 p-0 dragged  border-white' />}
           </div>
         })
        }
       </div>
     </div>
-    <div ref={gameAreaRef}  className="w-4/5 mx-auto flex justify-around animationArea">
+    <div ref={gameAreaRef}  className="w-4/5 mx-auto flex justify-around animationArea md:w-11/12">
           <div className='character'>
         <div ref={emojiRef} className="w-24 -mt-4">
           <img ref={imageRef} src={emoji} alt="" className='w-full h-auto' />
         </div>
       </div>
-      {Dots.length > 0 && Dots.map((dot, i) => <div key={i} className="dot w-6 h-6 rounded-full self-end">
-        <img src={shadow} alt="" />
+      {Dots.length > 0 && Dots.map((_dot, i) => <div key={i} className="dot w-6 h-6 rounded-full self-end">
+        <img src={shadow} alt="" className={i == 1 ? 'sm:-mt-1 sm:-ml-6 w-6' : ''} />
+        {i == 1 && <img src = {obstackle} className='ml-10 -mt-6 sm:-mt-10 w-16' />}
       </div> )
     }
       <div className="w-1/2">
@@ -209,4 +187,4 @@ useEffect(() => {
   );
 }
 
-export default Walk;
+export default Jump;
