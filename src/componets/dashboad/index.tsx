@@ -49,6 +49,8 @@ export default function Dashboard() {
         )
       ) : (
         <div className={`${styles.container} w-screen h-screen`}>
+          <div className='fixed top-4 right-10'>
+          </div>
           <div className={`w-4/5 mx-auto sm:w-11/12 flex mt-2 justify-between`}>
             <div className="flex gap-2">
               <div className="circle w-24 h-24 rounded-full bg-black sm:w-16 sm:h-16"></div>

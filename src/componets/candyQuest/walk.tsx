@@ -36,8 +36,6 @@ function Walk() {
   const {level } = useContext(levelcontext)
   const [isOpen, setIsOpen] = useState(false);
   const blockesRef = useRef<HTMLDivElement[]>([])
-  const [gameOver, setGameOver] = useState<boolean>(false)
-  const [gumPosition, setGumPosition] = useState<{top:number | null, left:number | null}>({top:null, left:null})
   const [Dots, setDots] = useState<number[]>([]);
   const [numberOfrequiredAnimation, setnumberOfrequiredAnimation] = useState<number>(2);
   const closeModal = () => setIsOpen(false);
@@ -50,7 +48,6 @@ function Walk() {
   const dragedItemRef = useRef<HTMLElement | null>(null);
   const deleteRef = useRef<HTMLDivElement>(null)
   const gameAreaRef = useRef<HTMLDivElement>(null)
-  const destinationRef = useRef<HTMLDivElement | null>(null)
   const [deleteIndex, setDeleteIndex]  = useState<number>()
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const [program, setProgram] = useState<Program[]>([{text:'onstart', style:null}]);
@@ -125,16 +122,23 @@ function applyAnimation(diffrence:number, duration:number, isLast:boolean){
     animation.finished.then(() =>{
       clearInterval(interval1)
       if(isLast){
-        setGameStatus({text:'you are reached', type:'seccuss'})
-        setIsOpen(true)
+        setTimeout(() => {
+          if(gumRef.current)
+           gumRef.current.style.display = 'none'
+           setTimeout(() => {
+            setGameStatus({text:'you are reached', type:'seccuss'})
+            setIsOpen(true)
+           }, 500)
+        }, 500)   
         return
       }
-      setGameStatus({text:'you are failed', type:'fail'})
-      setIsOpen(true)
+      setTimeout(() => {
+        setGameStatus({text:'you are failed', type:'fail'})
+        setIsOpen(true)
+      }, 1000)
     })
   })
 }
-
 useEffect(() => {
   if(level ==1){
     setDots([1, 2])

@@ -6,8 +6,7 @@ import gum from   '../../../assets/image/54650f8684aafa0d7d00004c.webp'
 import walk from '../../../assets/image/walk.webp'
 import emoji from '../../../assets/images/walking/index.webp'
 import shadow from '../../../assets/image/535805e584aafa4e55000016.webp'
-import  { DragEventHandler, useRef, useState, useContext, useEffect } from "react"
-import { levelcontext } from '../../dashboad'
+import  { DragEventHandler, useRef, useState, useEffect } from "react"
 import { ModalPart } from '../../modal/modal'
 import {AiOutlinePlayCircle} from 'react-icons/ai'
 import {RiDeleteBinFill} from 'react-icons/ri'
@@ -36,13 +35,11 @@ Object.keys(allimages).forEach(key => {
 })
 
 function Jump():JSX.Element {
-  const {level } = useContext(levelcontext)
   const [isOpen, setIsOpen] = useState(false);
   const blockesRef = useRef<HTMLDivElement[]>([])
   const [Dots, setDots] = useState<number[]>([]);
-  const [numberOfrequiredAnimation, setnumberOfrequiredAnimation] = useState<number>(2);
   const closeModal = () => setIsOpen(false);
-  const [gameStatus, setGameStatus] = useState< GameStatus>({text:null, type:'seccuss'});
+  const [gameStatus, setGameStatus] = useState<GameStatus>({text:null, type:'seccuss'});
 
   const dragItemsParent = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null)
@@ -71,11 +68,6 @@ function Jump():JSX.Element {
     }
   };
   
-  useEffect(() => {
-   if(gameStatus.type == 'fail'){
-    setIsOpen(true)
-   }
-  }, [gameStatus.type, gameStatus.text])
 
   const dropItem:DragEventHandler  = (e) => {
     e.preventDefault();
@@ -90,31 +82,79 @@ const deleteItem = () => {
   setProgram(temp)
 }
 
-const targetNodePostions:{ele:number, x:number}[] = [];
 function startMoving(){
 let emojiPosition = 0
 if(emojiRef.current){
  emojiPosition = emojiRef.current.getBoundingClientRect().x
 }
  const childs = gameAreaRef.current?.childNodes as NodeListOf<HTMLElement>
- const startingElementToJump = childs[2].childNodes[0] as HTMLElement
- const startingPositionToJump = startingElementToJump.getBoundingClientRect().x
- const targetDestination = childs[childs.length - 2]
- const targetPosition = targetDestination.getBoundingClientRect().x
- const diffrence = startingPositionToJump - emojiPosition
- applyAnimation(diffrence - 50)
+ const jumpIndex:number[] = []
+ const walkIndex:number[] = []
+ program.forEach(({text}:{text:string}, i) => {
+    if(i > 4)return
+    if(text === 'jump'){
+      jumpIndex.push(i)
+    }
+    if(text === 'walk'){
+      walkIndex.push(i)
+    }
+ }) 
+ const jumpingPostions:{x:number, isJump:boolean}[] = []
+ const walkingPostions:{x:number, isJump:boolean}[] = []
+ childs.forEach((child, i) => {
+  if(jumpIndex.includes(i)){
+    jumpingPostions.push({x:child.getBoundingClientRect().x - emojiPosition, isJump:true})
+  }
+  if(walkIndex.includes(i)){
+   walkingPostions.push({x:child.getBoundingClientRect().x - emojiPosition, isJump:false})
+  }
+ })
+ const animationPosition = [...jumpingPostions, ...walkingPostions].sort((a, b) => a.x - b.x)
+ console.log(animationPosition)
+  const keyFrames = [
+    {transform:`translate(0, 0)`}
+  ]
+   animationPosition.forEach(({x, isJump}, i, arr) => {
+   if(isJump){
+    const prv = arr[i-1]?.x
+    console.log(prv)
+    const transform = {transform:`translate(${prv - 50}, -50px)`}
+    const transform2 = {transform:`translate(${prv + 50}px, -50px)`}
+    const transform3 = {transform:`translate(${prv + 50}px, 0)`}
+    keyFrames.push(transform)
+    keyFrames.push(transform2)
+    keyFrames.push(transform3)
+   }
+   if(!isJump){
+    const px = i == arr.length - 1 ? x : x - 70
+    const transform = {transform:`translate(${px}px)`}
+    keyFrames.push(transform)
+   }
+  })
+  console.log(keyFrames)
+ applyAnimation(keyFrames)
 }
 
-function applyAnimation(diffrence:number){
-    emojiRef.current?.animate([{transform: `translateX(${diffrence}px)`},], {duration: 1000, fill: 'forwards'})
-    emojiRef.current?.getAnimations().forEach((animation) => animation.finished.then(() => {
-        // emojiRef.current?.animate([{transform: `translateY(${0}px)`},], {duration: 1000, fill: 'forwards'})
-    }))
+function applyAnimation(keyFrames:Keyframe[]){
+    emojiRef.current?.animate(keyFrames, {duration: 5000, fill: 'forwards'})
+  emojiRef.current?.getAnimations().forEach(animation => {
+    let index = 0
+    const interval = setInterval(() => {
+      if(images.length <= index) {
+         index = -1
+      }
+      ++index
+      if(!imageRef.current) return
+      imageRef.current.src = images[index]
+    }, 300)
+    animation.finished.then(() => {
+      clearInterval(interval)
+    })
+  })
 }
 
 useEffect(() => {
     setDots([1, 2, 3, 4])
-    setnumberOfrequiredAnimation(4)
 }, [])
 
   return (
