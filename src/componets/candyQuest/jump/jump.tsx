@@ -126,7 +126,7 @@ if(emojiRef.current){
     keyFrames.push(transform3)
    }
    if(!isJump){
-    const px = i == arr.length - 1 ? x : x - 70
+    const px = i == arr.length - 1 ? x : x - 100
     const transform = {transform:`translate(${px}px)`}
     keyFrames.push(transform)
    }
@@ -146,7 +146,7 @@ function applyAnimation(keyFrames:Keyframe[]){
       ++index
       if(!imageRef.current) return
       imageRef.current.src = images[index]
-    }, 300)
+    }, 200)
     animation.finished.then(() => {
       clearInterval(interval)
     })
