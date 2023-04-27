@@ -1,8 +1,9 @@
 import './walk.css'
+import LevelToggler from '../levelToggler/levelToggler'
 import onstart from '../../assets/image/onstart.png'
 import gum from   '../../assets/image/54650f8684aafa0d7d00004c.webp'
 import walk from '../../assets/image/walk.webp'
-import emoji from '../../assets/images/walking/index.webp'
+import emoji from '../../assets/image/initial.webp'
 import shadow from '../../assets/image/535805e584aafa4e55000016.webp'
 import  { DragEventHandler, useRef, useState, useContext, useEffect } from "react"
 import { levelcontext } from '../dashboad'
@@ -151,7 +152,9 @@ useEffect(() => {
 
   return (
     <div className='w-screen playArea h-screen' onDragOver={(e) => e.preventDefault()} onDrop={() => deleteRef.current?.classList.add('invisible')}>
-
+      <div className='absolute top-3 right-16'>
+        <LevelToggler />
+      </div>
       {gameStatus.text && <ModalPart isOpen={isOpen} onClose={closeModal} gameStatus={gameStatus} /> }
     <div className="w-4/5 h-auto flex mx-auto flex-wrap justify-center responsive">
       <div ref={deleteRef}  onDrop = {deleteItem} onDragOver={handleDragOver} className="delete w-48 h-full bg-slate-50 absolute left-0 flex justify-center items-center invisible">
@@ -194,7 +197,7 @@ useEffect(() => {
           <img ref={imageRef} src={emoji} alt="" className='w-full h-auto' />
         </div>
       </div>
-      {Dots.length > 0 && Dots.map((dot, i) => <div key={i} className="dot w-6 h-6 rounded-full self-end">
+      {Dots.length > 0 && Dots.map((_dot, i) => <div key={i} className="dot w-6 h-6 rounded-full self-end">
         <img src={shadow} alt="" />
       </div> )
     }

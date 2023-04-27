@@ -1,10 +1,13 @@
 import styles from './dashboard.module.css';
 import { useState, createContext } from 'react';
 import Walk from '../candyQuest/walk';
+import dashboardImage from '../../assets/image/Z.webp'
+import dashboardImage2 from '../../assets/image/z2.webp'
+import dashboardImage3 from '../../assets/image/9k2.webp'
+import dashboardImg from '../../assets/image/dashboardImg.webp'
 import Jump from '../candyQuest/jump/jump';
 import Repeat from '../candyQuest/reapt block/reapt';
 import { flushSync } from 'react-dom';
-import { UserButton } from '@clerk/clerk-react';
 import Loading from '../../Loading/loading';
 
 export interface ILevel {
@@ -53,29 +56,38 @@ export default function Dashboard() {
           </div>
           <div className={`w-4/5 mx-auto sm:w-11/12 flex mt-2 justify-between`}>
             <div className="flex gap-2">
-              <div className="circle w-24 h-24 rounded-full bg-black sm:w-16 sm:h-16"></div>
-              <div className="circle w-24 h-24 rounded-full bg-black sm:w-16 sm:h-16"></div>
-              <div className="circle w-24 h-24 rounded-full bg-black sm:w-16 sm:h-16"></div>
+              <div className="circle w-24 h-24 rounded-full ">
+                <img src={dashboardImage} alt="" className='w-36 h-auto rounded-full' />
+              </div>
+              <div className="circle w-24 h-24 rounded-full ">
+              <img src={dashboardImage2} alt="" className='w-36 h-auto rounded-full' />
+
+              </div>
+              <div className="circle w-24 h-24 rounded-full ">
+              <img src={dashboardImage3} alt="" className='w-36 h-auto rounded-full' />
+              </div>
             </div>
             <div>
-              <UserButton />
+              test
             </div>
           </div>
           <div className="w-4/5 sm:w-11/12 flex justify-around mx-auto mt-4 items-center h-1/2 sm:flex-col sm:justify-center">
-            <div>image</div>
+            <div className='md:w-1/2 mt-3'>
+              <img className='w-4/5 mx-auto' src={dashboardImg} alt="" />
+            </div>
             <div className="flex flex-col w-1/2 gap-2 items-end sm:items-center">
               <div className="w-1/2 text-center">Lessons</div>
               <button
                 onClick={() => playGame(1, 'WALK')}
                 className="bg-yellow-200 p-1 w-1/2 border-2 border-red-400 hover:bg-yellow-400"
               >
-                level 1
+                3 Lessons 
               </button>
               <button
                 onClick={() => playGame(2, 'JUMP')}
                 className="bg-yellow-200 p-1 w-1/2 border-2 border-green-500 hover:bg-yellow-400"
               >
-                level 2
+                1 Lesson
               </button>
             </div>
           </div>

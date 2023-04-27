@@ -1,29 +1,44 @@
 import './App.css'
+import {useState}from 'react'
 import Header from './componets/header/header';
 import Auth from './componets/Auth';
 import Dashboard from './componets/dashboad';
-import {useUser} from "@clerk/clerk-react";
+import {Routes, Route} from 'react-router-dom'
+import { createContext} from 'react';
+import Verify from './componets/Verify/Verify';
+import {useEffect} from 'react'
 
-import { createContext, useState } from 'react';
-
-export type User = Awaited<ReturnType<typeof useUser>>
 
 export interface IUser {
-  user:User | null
-  setUser?:(user:User | ((user:User) => User)) => void
+  user:{email:string} | null
+  setUser?:(user:{email:string} | ((user:string) => string)) => void
 } 
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const userContext = createContext<IUser>({user:null})
 function App(): JSX.Element {
-  const [level, setLevel] = useState<{level: number, jumpOrWalk: 'JUMP' | 'WALK' | null}>({level:0, jumpOrWalk: null})
-  const user = useUser()
-
+  const [user, setUser] = useState<{email:string} | null>(null)
+  useEffect(() => {
+   const token = localStorage.getItem('token')
+   if (token) {
+    (async() => {
+    const url = new URL('http://localhost:3000/verifyToken')
+    url.searchParams.append('token', token)
+     const response = await fetch(url.href)
+     const data = await response.json()
+     console.log(data)
+    })()
+   }
+  }, [])
   return <>
-  <userContext.Provider value={{user}}>
-    <Header setLevel = {setLevel} />
-    {user ? <Dashboard level = {level}/> : <Auth />}
-  </userContext.Provider>
+  <Header/>
+  <Routes>
+    <Route path="/" element={<userContext.Provider value={{user, setUser}}>
+    {user ? <Dashboard/> : <Auth />}
+    </userContext.Provider>} /> 
+    <Route path="/verify" element = {<Verify />} />
+  </Routes>
+ 
   </>
 }
 

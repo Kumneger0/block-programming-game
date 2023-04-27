@@ -2,12 +2,13 @@
 import onstart from '../../../assets/image/onstart.png'
 import gum from   '../../../assets/image/54650f8684aafa0d7d00004c.webp'
 import walk from '../../../assets/image/walk.webp'
+import LevelToggler from '../../levelToggler/levelToggler'
 import repeat from '../../../assets/image/reaptblock4.png'
 import repeatWithWalk from '../../../assets/image/reaptblock4withwalk.png'
 import {flushSync} from 'react-dom'
-import emoji from '../../../assets/images/walking/index.webp'
+import emoji from '../../../assets/image/initial.webp'
 import shadow from '../../../assets/image/535805e584aafa4e55000016.webp'
-import  { DragEventHandler, useRef, useState, useContext, useEffect, LegacyRef } from "react"
+import { DragEventHandler, useRef, useState, useContext, useEffect, LegacyRef } from "react"
 import { levelcontext } from '../../dashboad'
 import { ModalPart } from '../../modal/modal'
 import {AiOutlinePlayCircle} from 'react-icons/ai'
@@ -15,8 +16,8 @@ import {RiDeleteBinFill} from 'react-icons/ri'
 
 type Program = { text: string; style: string | null, isWalkAdded: boolean}
 export type GameStatus = {text:string | null; type:'fail' | 'seccuss'}
-const eating = await import.meta.glob('../../../assets/Eating/*')
-const allimages =  await import.meta.glob('../../../assets/images/walking/*')
+const eating = import.meta.glob('../../../assets/Eating/*')
+const allimages = import.meta.glob('../../../assets/images/walking/*')
 
 const imagesEating:string[] = []
 const images:string[] = []
@@ -190,7 +191,9 @@ useEffect(() => {
 
   return (
     <div className='w-screen playArea h-screen' onDragOver={(e) => e.preventDefault()} onDrop={() => deleteRef.current?.classList.add('invisible')}>
-
+    <div className='absolute top-3 right-16'>
+        <LevelToggler />
+      </div>
       {gameStatus.text && <ModalPart isOpen={isOpen} onClose={closeModal} gameStatus={gameStatus} /> }
     <div className="w-4/5 h-auto flex mx-auto flex-wrap justify-center responsive">
       <div ref={deleteRef}  onDrop = {deleteItem} onDragOver={handleDragOver} className="delete w-48 h-full bg-slate-50 absolute left-0 flex justify-center items-center invisible">

@@ -10,22 +10,22 @@ onClose:() => void;
 gameStatus:GameStatus;
 }) => {
 
-  //@ts-expect-error jkah
-  const {level, setLevel} = useContext<ILevel>(levelcontext)
+  
+  const {level, setLevel} = useContext<Partial<ILevel>>(levelcontext)
 
 if (!isOpen) return null;
 
 const closeAndReplay = () => {
-  flushSync(() =>  setLevel(0))
-  setLevel(() => level as number)
+  flushSync(() => setLevel && setLevel(0))
+  setLevel && setLevel(() => level as number)
   onClose()
 }
 
 const loadNextLesson = () => {
-  flushSync(() =>  setLevel(prv => {
+  flushSync(() => setLevel && setLevel(prv => {
     return prv - 1
   }))
-  setLevel((prv:number) => prv + 2)
+ setLevel && setLevel((prv:number) => prv + 2)
   onClose()
 }
   return (
@@ -46,7 +46,7 @@ const loadNextLesson = () => {
             >
               replay
             </button>
-            {gameStatus.type == 'seccuss' &&
+            {gameStatus.type == 'seccuss' && level && level !== 3 &&
             <button
               type="button"
               className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 ml-4"

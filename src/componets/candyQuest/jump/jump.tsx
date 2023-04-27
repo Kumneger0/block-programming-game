@@ -4,7 +4,7 @@ import jump from   '../../../assets/image/jump.png'
 import obstackle from '../../../assets/image/obstackle.webp'
 import gum from   '../../../assets/image/54650f8684aafa0d7d00004c.webp'
 import walk from '../../../assets/image/walk.webp'
-import emoji from '../../../assets/images/walking/index.webp'
+import emoji from '../../../assets/image/initial.webp'
 import shadow from '../../../assets/image/535805e584aafa4e55000016.webp'
 import  { DragEventHandler, useRef, useState, useEffect } from "react"
 import { ModalPart } from '../../modal/modal'
@@ -55,7 +55,6 @@ function Jump():JSX.Element {
   const  dragItems:DragEventHandler = (e)  => {
     const element = e.target as HTMLImageElement
     const blockName = element.src.split('/').slice(-1)[0].split(".")[0] as 'jump' | 'walk'
-    console.log(blockName)
     flushSync(() => setItem(blockName))
     dragedItemRef.current = e.target as HTMLElement
   }
@@ -81,78 +80,125 @@ const deleteItem = () => {
   const temp = [...program].filter((_program, i) => i !== deleteIndex)
   setProgram(temp)
 }
+let gumPosition=0
+let isCorrect = false;
+function startMoving() {
+  const emojiPosition = getEmojiPosition();
+  const { jumpIndex, walkIndex } = getJumpAndWalkIndices();
+  const { jumpingPositions, walkingPositions } = getJumpingAndWalkingPositions(emojiPosition, jumpIndex, walkIndex);
 
-function startMoving(){
-let emojiPosition = 0
-if(emojiRef.current){
- emojiPosition = emojiRef.current.getBoundingClientRect().x
-}
- const childs = gameAreaRef.current?.childNodes as NodeListOf<HTMLElement>
- const jumpIndex:number[] = []
- const walkIndex:number[] = []
- program.forEach(({text}:{text:string}, i) => {
-    if(i > 4)return
-    if(text === 'jump'){
-      jumpIndex.push(i)
-    }
-    if(text === 'walk'){
-      walkIndex.push(i)
-    }
- }) 
- const jumpingPostions:{x:number, isJump:boolean}[] = []
- const walkingPostions:{x:number, isJump:boolean}[] = []
- childs.forEach((child, i) => {
-  if(jumpIndex.includes(i)){
-    jumpingPostions.push({x:child.getBoundingClientRect().x - emojiPosition, isJump:true})
-  }
-  if(walkIndex.includes(i)){
-   walkingPostions.push({x:child.getBoundingClientRect().x - emojiPosition, isJump:false})
-  }
- })
- const animationPosition = [...jumpingPostions, ...walkingPostions].sort((a, b) => a.x - b.x)
- console.log(animationPosition)
-  const keyFrames = [
-    {transform:`translate(0, 0)`}
-  ]
-   animationPosition.forEach(({x, isJump}, i, arr) => {
-   if(isJump){
-    const prv = arr[i-1]?.x
-    console.log(prv)
-    const transform = {transform:`translate(${prv - 50}, -50px)`}
-    const transform2 = {transform:`translate(${prv + 50}px, -50px)`}
-    const transform3 = {transform:`translate(${prv + 50}px, 0)`}
-    keyFrames.push(transform)
-    keyFrames.push(transform2)
-    keyFrames.push(transform3)
-   }
-   if(!isJump){
-    const px = i == arr.length - 1 ? x : x - 100
-    const transform = {transform:`translate(${px}px)`}
-    keyFrames.push(transform)
-   }
-  })
-  console.log(keyFrames)
- applyAnimation(keyFrames)
+  const animationPosition = [...jumpingPositions, ...walkingPositions].sort((a, b) => a.x - b.x);
+  console.log(animationPosition);
+
+  const keyFrames = createKeyFrames(animationPosition);
+  console.log(keyFrames);
+
+  applyAnimation(keyFrames);
 }
 
-function applyAnimation(keyFrames:Keyframe[]){
-    emojiRef.current?.animate(keyFrames, {duration: 5000, fill: 'forwards'})
-  emojiRef.current?.getAnimations().forEach(animation => {
-    let index = 0
-    const interval = setInterval(() => {
-      if(images.length <= index) {
-         index = -1
+function getEmojiPosition() {
+  let emojiPosition = 0;
+  if (emojiRef.current) {
+    emojiPosition = emojiRef.current.getBoundingClientRect().x;
+  }
+  return emojiPosition;
+}
+
+function getJumpAndWalkIndices() {
+  const jumpIndex:number[] = [];
+  const walkIndex:number[] = [];
+
+  program.forEach(({ text }, i) => {
+    if (i > 4) return;
+    if (text === "jump") {
+      jumpIndex.push(i);
+    }
+    if (text === "walk") {
+      walkIndex.push(i);
+    }
+  });
+
+  return { jumpIndex, walkIndex };
+}
+
+function getJumpingAndWalkingPositions(emojiPosition:number, jumpIndex:number[], walkIndex:number[]) {
+  const childs = gameAreaRef.current?.childNodes as NodeListOf<HTMLElement>;
+   gumPosition = childs[childs.length - 2].getBoundingClientRect().x
+  const jumpingPositions:{x:number, isJump:boolean}[] = []
+  const walkingPositions:{x:number, isJump:boolean}[] = []
+
+  childs.forEach((child, i) => {
+    if (jumpIndex.includes(i)) {
+      if(i == 3){
+        isCorrect = true
       }
-      ++index
-      if(!imageRef.current) return
-      imageRef.current.src = images[index]
-    }, 200)
-    animation.finished.then(() => {
-      clearInterval(interval)
-    })
-  })
+      jumpingPositions.push({ x: child.getBoundingClientRect().x - emojiPosition, isJump: true });
+    }
+    if (walkIndex.includes(i)) {
+      walkingPositions.push({ x: child.getBoundingClientRect().x - emojiPosition, isJump: false });
+    }
+  });
+
+  return { jumpingPositions, walkingPositions };
+}
+function createKeyFrames(animationPosition:{x:number, isJump:boolean}[] = []) {
+  const keyFrames = [{ transform: `translate(0, 0)` }];
+
+  animationPosition.forEach(({ x, isJump }, i, arr) => {
+    if (isJump) {
+      const prv = arr[i - 1]?.x ?? 0;
+      console.log(prv)
+      const transform = { transform: `translate(${prv - 100}, -50px)` };
+      const transform2 = { transform: `translate(${prv + 50}px, -50px)` };
+      const transform3 = { transform: `translate(${prv + 50}px, 0)` };
+      keyFrames.push(transform, transform2, transform3);
+    }
+    if (!isJump) {
+      const px = i === arr.length - 1 ? x - 50 : x - 100;
+      const transform = { transform: `translate(${px}px)` };
+      keyFrames.push(transform);
+    }
+  });
+
+  return keyFrames;
 }
 
+function applyAnimation(keyFrames:Keyframe[]) {
+  emojiRef.current?.animate(keyFrames, { duration: 5000, fill: "forwards" });
+
+  emojiRef.current?.getAnimations().forEach((animation) => {
+    let index = 0;
+    const interval = setInterval(() => {
+      if (images.length <= index) {
+        index = -1;
+      }
+      ++index;
+      if (!imageRef.current) return;
+      imageRef.current.src = images[index];
+    }, 200);
+
+    animation.finished.then(() => {
+      clearInterval(interval);
+      let isGameOver = false
+      if(emojiRef.current){
+       isGameOver = Math.floor(gumPosition - 50) == Math.floor(emojiRef.current.getBoundingClientRect().x) && isCorrect
+      }
+      setTimeout(() => {
+          if(isGameOver){
+            if(gumRef.current == null) return
+            gumRef.current.style.display = 'none'
+            setTimeout(() => {
+              setGameStatus({text:"good", type:'seccuss'})
+              setIsOpen(true)
+            }, 500)
+            return
+          }
+          setGameStatus({text:"failed", type:'fail'})
+          setIsOpen(true)
+      }, 1000)
+    });
+  });
+}
 useEffect(() => {
     setDots([1, 2, 3, 4])
 }, [])
