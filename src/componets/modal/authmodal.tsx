@@ -39,6 +39,29 @@ if(data.message == 'Email sent'){
 }
 setSuccess(false)
 } 
+
+
+async function newUser(){
+  setIsLoading(true)
+const { value } = emailRef.current as HTMLInputElement
+const url = new URL('http://localhost:3000/register')
+const response =  await fetch(url, {
+  method:'post', 
+  headers:{
+    'Content-Type': 'application/json',
+  }, 
+  body:JSON.stringify({
+    email:value
+  })
+})
+if(response.ok){
+  const data = await response.json()
+  console.log(data)
+ }
+ console.log(response)
+ setIsLoading(false)
+}
+
   return (
     <div className="fixed z-10 inset-0 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen">
@@ -55,7 +78,7 @@ setSuccess(false)
             </div>
             <div>
                 <button onClick={authenticateUser} className="m-3 bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700">sing in</button>
-                <button className="m-3 bg-green-500 text-white font-semibold py-2 px-4 rounded hover:bg-green-700">sing up</button>
+                <button onClick={newUser} className="m-3 bg-green-500 text-white font-semibold py-2 px-4 rounded hover:bg-green-700">sing up</button>
             </div>
 </> : isLoading ? <>please wait</> : success ? <>verifiaction email sent to you email addres check your inbox or spam folder</> : <>we are unble to sent verifiaction email</>} </>
             <div className="w-full flex flex-col items-center">

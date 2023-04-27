@@ -26,7 +26,9 @@ function App(): JSX.Element {
     url.searchParams.append('token', token)
      const response = await fetch(url.href)
      const data = await response.json()
-     console.log(data)
+     if(data.responce.email){
+      setUser({email: data.responce.email})
+     }
     })()
    }
   }, [])
@@ -36,7 +38,7 @@ function App(): JSX.Element {
     <Route path="/" element={<userContext.Provider value={{user, setUser}}>
     {user ? <Dashboard/> : <Auth />}
     </userContext.Provider>} /> 
-    <Route path="/verify" element = {<Verify />} />
+    <Route path="/verify" element = {<Verify user = {user} setUser = {setUser} />} />
   </Routes>
  
   </>

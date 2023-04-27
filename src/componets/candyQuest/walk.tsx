@@ -126,6 +126,9 @@ function applyAnimation(diffrence:number, duration:number, isLast:boolean){
         setTimeout(() => {
           if(gumRef.current)
            gumRef.current.style.display = 'none'
+           if(imageRef.current){
+            imageRef.current.src = emoji
+           }
            setTimeout(() => {
             setGameStatus({text:'you are reached', type:'seccuss'})
             setIsOpen(true)
