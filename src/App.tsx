@@ -35,9 +35,13 @@ function App(): JSX.Element {
   return <>
   <Header/>
   <Routes>
+  { /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */ }
+     {/*@ts-ignore */}
     <Route path="/" element={<userContext.Provider value={{user, setUser}}>
     {user ? <Dashboard/> : <Auth />}
     </userContext.Provider>} /> 
+    { /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */ }
+     {/*@ts-ignore */}
     <Route path="/verify" element = {<Verify user = {user} setUser = {setUser} />} />
   </Routes>
  

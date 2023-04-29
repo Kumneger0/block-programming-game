@@ -25,3 +25,7 @@ dist-ssr
 github
 github.pub
 .vercel
+.firebase
+firebase.json
+.firebaserc
+.firebase/hosting.ZGlzdA.cache

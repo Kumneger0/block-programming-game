@@ -1,13 +1,12 @@
-import {useEffect, useState} from 'react'
+import {useEffect} from 'react'
 import {useSearchParams} from 'react-router-dom'
 let shouldReturn = false;
 let count = 0
 interface IUser {
   email:string;
 }
-export default function Verify({user, setUser}:{user:IUser, setUser:(user:IUser) => void}) {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const [success, setSuccess] = useState(false)
+export default function Verify({user, setUser}:{user:IUser | null, setUser:(user:IUser | ((user:string) => string)) => void}) {
+  const [searchParams] = useSearchParams()
   useEffect(() => {
   const token = searchParams.get('token')
    const id = searchParams.get('id')

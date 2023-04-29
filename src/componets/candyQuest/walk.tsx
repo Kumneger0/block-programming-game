@@ -1,11 +1,12 @@
 import './walk.css'
 import LevelToggler from '../levelToggler/levelToggler'
 import onstart from '../../assets/image/onstart.png'
+import { Helmet } from 'react-helmet';
 import gum from   '../../assets/image/54650f8684aafa0d7d00004c.webp'
 import walk from '../../assets/image/walk.webp'
 import emoji from '../../assets/image/initial.webp'
 import shadow from '../../assets/image/535805e584aafa4e55000016.webp'
-import  { DragEventHandler, useRef, useState, useContext, useEffect } from "react"
+import  React, { DragEventHandler, useRef, useState, useContext, useEffect } from "react"
 import { levelcontext } from '../dashboad'
 import { ModalPart } from '../modal/modal'
 import {AiOutlinePlayCircle} from 'react-icons/ai'
@@ -13,7 +14,7 @@ import {RiDeleteBinFill} from 'react-icons/ri'
 
 type Program = { text: string; style: string | null }
 export type GameStatus = {text:string | null; type:'fail' | 'seccuss'}
-const eating = import.meta.glob('../../assets/Eating/*')
+const eating = import.meta.glob('../../assets/image/Eating/*')
 const imagesEating:string[] = []
 Object.keys(eating).forEach(key => {
   eating[key]().then((res) => {
@@ -23,7 +24,7 @@ Object.keys(eating).forEach(key => {
   })
 })
 
-const allimages = import.meta.glob('../../assets/images/walking/*')
+const allimages = import.meta.glob('../../assets/image/images/walking/*')
 const images:string[] = []
 Object.keys(allimages).forEach(key => {
   allimages[key]().then((res) => {
@@ -32,22 +33,29 @@ Object.keys(allimages).forEach(key => {
     images.push(path)
   })
 })
-
+function returnImages(){
+  return images
+}
 function Walk() {
   const {level } = useContext(levelcontext)
   const [isOpen, setIsOpen] = useState(false);
   const blockesRef = useRef<HTMLDivElement[]>([])
   const [Dots, setDots] = useState<number[]>([]);
   const [numberOfrequiredAnimation, setnumberOfrequiredAnimation] = useState<number>(2);
+  const [item, setItem] = useState<number|null>(null)
   const closeModal = () => setIsOpen(false);
   const [gameStatus, setGameStatus] = useState< GameStatus>({text:null, type:'seccuss'});
 
   const dragItemsParent = useRef<HTMLDivElement>(null);
+  const [Images, setImages] = useState<string[]>([])
   const imageRef = useRef<HTMLImageElement>(null)
+  const draggableItemRef = useRef<HTMLElement>(null)
   const emojiRef = useRef<HTMLDivElement>(null)
   const gumRef = useRef<HTMLButtonElement>(null)
   const dragedItemRef = useRef<HTMLElement | null>(null);
   const deleteRef = useRef<HTMLDivElement>(null)
+  const [touchStartPosition, setTouchStartPosition] = useState<{x:number, y:number}>({x:0, y:0})
+  const [elementStartPosition, setElementStartPosition]= useState<{x:number, y:number}>({x:0, y:0})
   const gameAreaRef = useRef<HTMLDivElement>(null)
   const [deleteIndex, setDeleteIndex]  = useState<number>()
   const dropZoneRef = useRef<HTMLDivElement>(null);
@@ -64,6 +72,14 @@ function Walk() {
     }
   };
   
+ useEffect(() => {
+   const images = returnImages()
+   if(images.length){
+    setImages(images)
+   }
+ }, [])
+
+
   useEffect(() => {
    if(gameStatus.type == 'fail'){
     setIsOpen(true)
@@ -153,8 +169,75 @@ useEffect(() => {
   }
 }, [level])
 
+
+
+useEffect(() => {
+ const images = returnImages()
+  if(images.length){
+  console.log(images)
+  setImages(images)
+}
+if(draggableItemRef.current){
+  draggableItemRef.current.addEventListener('touchmove', handleTouchMove, { passive: false });
+  draggableItemRef.current.addEventListener('touchend', handleTouchEnd, { passive: false });
+  draggableItemRef.current.addEventListener('touchstart', handleTouchStart, { passive: false })
+}
+return () => {
+  draggableItemRef.current?.removeEventListener('touchmove', handleTouchMove, { passive: false });
+  draggableItemRef.current?.removeEventListener('touchend', handleTouchEnd, { passive: false });
+  draggableItemRef.current?.removeEventListener('touchstart', handleTouchStart, { passive: false })
+}
+}, [])
+function handleTouchMove(e:React.TouchEvent){
+  e.preventDefault();
+  const target = e.target as HTMLElement;
+  const deltaX = e.touches[0].clientX - touchStartPosition.x;
+  const deltaY = e.touches[0].clientY - touchStartPosition.y;
+   if(draggableItemRef.current){
+      draggableItemRef.current.style.left = elementStartPosition.x + deltaX + 'px';
+     draggableItemRef.current.style.top = elementStartPosition.y + deltaY + 'px';
+   }
+}
+function handleTouchStart (e:React.TouchEvent){
+  e.preventDefault();
+  setTouchStartPosition({x: e.touches[0].clientX,
+    y: e.touches[0].clientY})
+    if(draggableItemRef.current){
+      setElementStartPosition({
+        x: parseInt(draggableItemRef.current.style.left) || 0,
+        y: parseInt(draggableItemRef.current.style.top) || 0
+      })
+    }
+}
+
+
+function handleTouchEnd(e: TouchEvent) {
+  if (!draggableItemRef.current) return;
+  const touch = e.changedTouches[0];
+  const dropZone = dropZoneRef.current;
+  const element = document.elementFromPoint(touch.clientX, touch.clientY);
+  if (element === dropZone) {
+   setItem(Math.random())
+   draggableItemRef.current.style.left = touchStartPosition.x + 'px'
+   draggableItemRef.current.style.top = touchStartPosition.y + 'px'
+   setTouchStartPosition({x:0, y:0})
+   setElementStartPosition({x:0, y:0})
+  }
+}
+
+useEffect(() => {
+  if(item  == null) return
+const temp = [...program, {text:'', style:Math.random().toString()},]
+setProgram(temp)
+}, [item])
   return (
-    <div className='w-screen playArea h-screen' onDragOver={(e) => e.preventDefault()} onDrop={() => deleteRef.current?.classList.add('invisible')}>
+ <>{Images.length ? <Helmet>{Images.map(img => {
+  return <link rel="preload" href={img} as="image" />
+ })
+
+  } </Helmet> : <></>
+
+ }<div className='w-screen playArea h-screen  overflow-x-hidden' onDragOver={(e) => e.preventDefault()} onDrop={() => deleteRef.current?.classList.add('invisible')}>
       <div className='absolute top-3 right-16'>
         <LevelToggler />
       </div>
@@ -168,8 +251,9 @@ useEffect(() => {
       <div ref={dragItemsParent} className="w-1/2 justify-self-start">
         <button
           draggable={true}
+          ref = {draggableItemRef}
           onDragStart={dragItems}
-          className="w-20"
+          className="w-20 relative select-none"
         >
           <img src={walk} alt="" className='w-full' />
         </button>
@@ -177,6 +261,7 @@ useEffect(() => {
       <div
         ref={dropZoneRef}
         onDragOver={handleDragOver}
+        id = 'dropzone'
         onDrop={dropItem}
         className="w-28"
         style={{maxHeight:'500px', height:'300px', overflowY:'auto'}}
@@ -204,7 +289,7 @@ useEffect(() => {
         <img src={shadow} alt="" />
       </div> )
     }
-      <div className="w-1/2">
+      <div className="w-1/2 sm:-ml-8">
         <button ref={gumRef} className='w-8 h-8 -ml-16 sm:-ml-12 z-10'>
           <img src={gum} alt="" />
         </button>
@@ -216,7 +301,7 @@ useEffect(() => {
       </div>
     </div>
     </div>
-  );
+  </>);
 }
 
 export default Walk;

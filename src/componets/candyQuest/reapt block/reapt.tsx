@@ -2,6 +2,7 @@
 import onstart from '../../../assets/image/onstart.png'
 import gum from   '../../../assets/image/54650f8684aafa0d7d00004c.webp'
 import walk from '../../../assets/image/walk.webp'
+import { Helmet } from 'react-helmet';
 import LevelToggler from '../../levelToggler/levelToggler'
 import repeat from '../../../assets/image/reaptblock4.png'
 import repeatWithWalk from '../../../assets/image/reaptblock4withwalk.png'
@@ -16,8 +17,8 @@ import {RiDeleteBinFill} from 'react-icons/ri'
 
 type Program = { text: string; style: string | null, isWalkAdded: boolean}
 export type GameStatus = {text:string | null; type:'fail' | 'seccuss'}
-const eating = import.meta.glob('../../../assets/Eating/*')
-const allimages = import.meta.glob('../../../assets/images/walking/*')
+const eating = import.meta.glob('../../../assets/image/Eating/*')
+const allimages = import.meta.glob('../../../assets/image/images/walking/*')
 
 const imagesEating:string[] = []
 const images:string[] = []
@@ -40,6 +41,11 @@ Object.keys(allimages).forEach(key => {
 })
 
 
+
+function returnImages(){
+  return images
+}
+
 function Repeat() {
 const {level } = useContext(levelcontext)
 const [item, setItem] = useState<'reaptblock4' | 'walk' | null>(null)
@@ -51,6 +57,11 @@ const [item, setItem] = useState<'reaptblock4' | 'walk' | null>(null)
 
   const dragItemsParent = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null)
+  const [Images, setImages] = useState<string[]>([])
+  const draggableItemRef2 = useRef<HTMLElement>(null)
+  const [touchStartPosition, setTouchStartPosition] = useState<{x:number, y:number}>({x:0, y:0})
+  const [elementStartPosition, setElementStartPosition]= useState<{x:number, y:number}>({x:0, y:0})
+  const draggableItemRef1 = useRef<HTMLElement>(null)
   const emojiRef = useRef<HTMLDivElement>(null)
   const gumRef = useRef<HTMLButtonElement>(null)
   const dragedItemRef = useRef<HTMLElement | null>(null);
@@ -58,11 +69,13 @@ const [item, setItem] = useState<'reaptblock4' | 'walk' | null>(null)
   const gameAreaRef = useRef<HTMLDivElement>(null)
   const [deleteIndex, setDeleteIndex]  = useState<number>()
   const dropZoneRef = useRef<HTMLDivElement>(null);
+  const [name, setName] = useState<string>(null)
+  const shouldDropRef = useRef<boolean | null>(null)
   const [program, setProgram] = useState<Program[]>([{text:'onstart', style:null, isWalkAdded:false}]);
   const  dragItems:DragEventHandler = (e)  => {
     dragedItemRef.current = e.target as HTMLElement
     const element = e.target as HTMLImageElement
-    const blockName = element.src.split('/').slice(-1)[0].split(".")[0] as 'reaptblock4' | 'walk'
+    const blockName = element.id as 'reaptblock4' | 'walk'
     console.log(blockName)
     flushSync(() => setItem(blockName))
     dragedItemRef.current = e.target as HTMLElement
@@ -80,15 +93,12 @@ const [item, setItem] = useState<'reaptblock4' | 'walk' | null>(null)
 
  const dropItem: DragEventHandler = (e) => {
   e.preventDefault();
-
   if (dragedItemRef.current?.classList.contains('dragged')) return;
-
   const temp = [...program];
 
   const lastItem = temp[temp.length - 1];
   const isLastItemWalkRelated =
     lastItem.text === "onstart" || lastItem.text === "walk";
-
   if (item === "walk" && !lastItem.isWalkAdded && !isLastItemWalkRelated) {
     if (lastItem.text === "reaptblock4" && !lastItem.isWalkAdded) {
       lastItem.isWalkAdded = true;
@@ -189,78 +199,248 @@ useEffect(() => {
   }
 }, [level])
 
-  return (
-    <div className='w-screen playArea h-screen' onDragOver={(e) => e.preventDefault()} onDrop={() => deleteRef.current?.classList.add('invisible')}>
-    <div className='absolute top-3 right-16'>
+
+useEffect(() => {
+if(name == null) return
+const temp = [...program]
+const lastItem = temp[temp.length - 1]
+if(name == 'walk' &&  lastItem?.text == 'reaptblock4' && !lastItem.isWalkAdded){
+ temp[temp.length-1].isWalkAdded = true
+ setProgram(temp)
+}else{
+  temp.push({text:name as string, style:null, isWalkAdded:false})
+  setProgram(temp)
+}
+   if(name  == 'walk'){
+     draggableItemRef2.current.style.left = touchStartPosition.x + 'px'
+     draggableItemRef2.current.style.top = touchStartPosition.y + 'px'
+   }
+   if(name == 'reaptblock4'){
+     draggableItemRef1.current.style.left = touchStartPosition.x + 'px'
+     draggableItemRef1.current.style.top = touchStartPosition.y + 'px'
+   }
+   setTouchStartPosition({x:0, y:0}) 
+   setElementStartPosition({x:0, y:0})
+}, [name])
+
+
+
+useEffect(() => {
+  const images = returnImages();
+  if (images.length) {
+    setImages(images);
+  }
+  document.body.classList.add('overflow-x-hidden');
+
+  const handleTouchMoveWrapper = (e) => handleTouchMove(e, { passive: false });
+  const handleTouchEndWrapper = (e) => handleTouchEnd(e, { passive: false });
+  const handleTouchStartWrapper = (e) => handleTouchStart(e, { passive: false });
+
+  if (draggableItemRef1.current && draggableItemRef2.current) {
+    draggableItemRef1.current.addEventListener('touchmove', handleTouchMoveWrapper);
+    draggableItemRef1.current.addEventListener('touchend', handleTouchEndWrapper);
+    draggableItemRef1.current.addEventListener('touchstart', handleTouchStartWrapper);
+    draggableItemRef2.current.addEventListener('touchmove', handleTouchMoveWrapper);
+    draggableItemRef2.current.addEventListener('touchend', handleTouchEndWrapper);
+    draggableItemRef2.current.addEventListener('touchstart', handleTouchStartWrapper);
+  }
+
+  return () => {
+    draggableItemRef1.current?.removeEventListener('touchmove', handleTouchMoveWrapper);
+    draggableItemRef1.current?.removeEventListener('touchend', handleTouchEndWrapper);
+    draggableItemRef1.current?.removeEventListener('touchstart', handleTouchStartWrapper);
+    draggableItemRef2.current?.removeEventListener('touchmove', handleTouchMoveWrapper);
+    draggableItemRef2.current?.removeEventListener('touchend', handleTouchEndWrapper);
+    draggableItemRef2.current?.removeEventListener('touchstart', handleTouchStartWrapper);
+  };
+}, []);
+
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function handleTouchMove(e:React.TouchEvent, _options:{passive:false}){
+  e.preventDefault();
+  const target = e.target as HTMLElement;
+  const deltaX = e.touches[0].clientX - touchStartPosition.x;
+  const deltaY = e.touches[0].clientY - touchStartPosition.y;
+  const DOMRect = dropZoneRef.current?.lastElementChild?.getBoundingClientRect() as DOMRect;
+  const draggDOMrect = dropZoneRef.current?.lastElementChild?.getBoundingClientRect()
+  const touch = e.changedTouches[0];
+  const dropZone = dropZoneRef.current;
+  const element = document.elementFromPoint(touch.clientX, touch.clientY);
+  if(dropZone === element){
+    dropZone.style.background = 'green';
+    shouldDropRef.current = true;
+  }else{
+    shouldDropRef.current = false;
+  }
+  if(target.id == 'walk'){
+    if(draggableItemRef2.current){
+      draggableItemRef2.current.style.left = elementStartPosition.x + deltaX + 'px';
+      draggableItemRef2.current.style.top = elementStartPosition.y + deltaY + 'px';
+    }
+  }
+
+else{
+  if(draggableItemRef1.current){
+     draggableItemRef1.current.style.left = elementStartPosition.x + deltaX + 'px';
+    draggableItemRef1.current.style.top = elementStartPosition.y + deltaY + 'px';
+  }
+}
+
+}
+function handleTouchStart (e:React.TouchEvent){
+  e.preventDefault();
+  const target = e.target as HTMLElement
+  const id = target.id
+  if(id == 'reaptblock4'){
+    dragedItemRef.current = draggableItemRef1.current
+  }else{
+    dragedItemRef.current = draggableItemRef2.current
+  }
+  setTouchStartPosition({x: e.touches[0].clientX,
+    y: e.touches[0].clientY})
+    if(draggableItemRef1.current || draggableItemRef2.current){
+      if(id == 'reaptblock4' && draggableItemRef1.current){
+          setElementStartPosition({
+          x: parseInt(draggableItemRef1.current.style.left) || 0,
+          y: parseInt(draggableItemRef1.current.style.top) || 0
+        })
+      }
+      if(id == 'walk' && draggableItemRef2.current){
+        setElementStartPosition({
+          x: parseInt(draggableItemRef2.current.style.left) || 0,
+          y: parseInt(draggableItemRef2.current.style.top) || 0
+        })
+      }
+    }
+}
+
+
+function handleTouchEnd(e: TouchEvent) {
+  const target = e.target as HTMLElement
+  const touch = e.changedTouches[0];
+  const dropZone = dropZoneRef.current;
+  dropZone.style.background = 'initial'
+  const element = document.elementFromPoint(touch.clientX, touch.clientY);
+  if (element === dropZone) {
+   flushSync(() => setItem(target.id as 'reaptblock4' | 'walk'))
+  }
+  if(shouldDropRef.current){
+     setName(target.id)
+  }
+}
+
+return (
+  <>
+    {Images.length ? (
+      <Helmet>
+        {Images.map((img) => {
+          return <link rel="preload" href={img} as="image" />;
+        })}
+      </Helmet>
+    ) : (
+      <></>
+    )}
+    <div
+      className="w-screen playArea h-screen"
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={() => deleteRef.current?.classList.add("invisible")}
+    >
+      <div className="absolute top-3 right-16">
         <LevelToggler />
       </div>
-      {gameStatus.text && <ModalPart isOpen={isOpen} onClose={closeModal} gameStatus={gameStatus} /> }
-    <div className="w-4/5 h-auto flex mx-auto flex-wrap justify-center responsive">
-      <div ref={deleteRef}  onDrop = {deleteItem} onDragOver={handleDragOver} className="delete w-48 h-full bg-slate-50 absolute left-0 flex justify-center items-center invisible">
-        <div className='w-9'>
-            <RiDeleteBinFill className = 'w-full h-auto' />
-        </div>
-      </div>
-      <div ref={dragItemsParent} className="w-1/2 justify-self-start">
-      <button
-          draggable={true}
-          onDragStart={dragItems}
-          className="w-20"
+      {gameStatus.text && (
+        <ModalPart
+          isOpen={isOpen}
+          onClose={closeModal}
+          gameStatus={gameStatus}
+        />
+      )}
+      <div className="w-4/5 h-auto flex mx-auto flex-wrap justify-center responsive">
+        <div
+          ref={deleteRef}
+          onDrop={deleteItem}
+          onDragOver={handleDragOver}
+          className="delete w-48 h-full bg-slate-50 absolute left-0 flex justify-center items-center invisible"
         >
-          <img src={walk} alt="" className='w-full' />
-        </button>
-        <button  draggable={true}
-          onDragStart={dragItems}
-          className="w-20">
-        <img src={repeat} alt="" />
-        </button>
-      </div>
-      <div
-        ref={dropZoneRef}
-        onDragOver={handleDragOver}
-        onDrop={dropItem}
-        className="w-28"
-        style={{maxHeight:'500px', height:'300px', overflowY:'auto'}}
-      >{
-        program.map(({ text, isWalkAdded }, i) => (
+          <div className="w-9">
+            <RiDeleteBinFill className="w-full h-auto" />
+          </div>
+        </div>
+        <div ref={dragItemsParent} className="w-full md:w-1/2 justify-self-start">
+          <button
+            draggable={true}
+            onDragStart={dragItems}
+            className="w-20 absolute select-none"
+            ref={draggableItemRef2}
+          >
+            <img id="walk" src={walk} alt="" className="w-full" />
+          </button>
+          <button
+            draggable={true}
+            onDragStart={dragItems}
+            ref={draggableItemRef1}
+            className="w-20 absolute top-28 select-none"
+          >
+            <img id="reaptblock4" src={repeat} alt="" />
+          </button>
+        </div>
+        <div
+          ref={dropZoneRef}
+          onDragOver={handleDragOver}
+          onDrop={dropItem}
+          className="w-28"
+          style={{ maxHeight: "500px", height: "300px", overflowY: "auto" }}
+        >
+          {program.map(({ text, isWalkAdded }, i) => (
             <ProgramBlock
               text={text}
               isWalkAdded={isWalkAdded}
               index={i}
               blockRef={(el: HTMLDivElement) => (blockesRef.current[i] = el!)}
               onDragStart={(e: React.DragEvent) => {
-                deleteRef.current?.classList.remove('invisible');
+                deleteRef.current?.classList.remove("invisible");
                 setDeleteIndex(i);
                 dragedItemRef.current = e.target as HTMLElement;
               }}
             />
-          )) 
-          }
-      </div>
-    </div>
-    <div ref={gameAreaRef}  className="w-4/5 mx-auto flex justify-around animationArea">
-          <div className='character'>
-        <div ref={emojiRef} className="w-24 -mt-4">
-          <img ref={imageRef} src={emoji} alt="" className='w-full h-auto' />
+          ))}
         </div>
       </div>
-      {Dots.length > 0 && Dots.map((_dot, i) => <div key={i} className="dot w-6 h-6 rounded-full self-end">
-        <img src={shadow} alt="" />
-      </div> )
-    }
-      <div className="w-1/2">
-        <button ref={gumRef} className='w-8 h-8 -ml-16 sm:-ml-12 z-10'>
-          <img src={gum} alt="" />
-        </button>
+      <div
+        ref={gameAreaRef}
+        className="w-4/5 mx-auto flex justify-around animationArea"
+      >
+        <div className="character">
+          <div ref={emojiRef} className="w-24 -mt-4">
+            <img ref={imageRef} src={emoji} alt="" className="w-full h-auto" />
+          </div>
+        </div>
+        {Dots.length > 0 &&
+          Dots.map((_dot, i) => (
+            <div key={i} className="dot w-6 h-6 rounded-full self-end">
+              <img src={shadow} alt="" />
+            </div>
+          ))}
+        <div className="w-1/2">
+          <button ref={gumRef} className="w-8 h-8 -ml-16 md:-ml-12 z-10">
+            <img src={gum} alt="" />
+          </button>
+        </div>
       </div>
-      </div>
-    <div className="playBTN fixed bottom-0 right-24 w-9 p-8">
-      <div role='button' onClick={startMoving} className='playBtn w-full hover:cursor-pointer'>
-        <AiOutlinePlayCircle className='w-24 h-24 '  />
+      <div className="playBTN fixed bottom-0 right-24 w-9 p-8">
+        <div
+          role="button"
+          onClick={startMoving}
+          className="playBtn w-full hover:cursor-pointer"
+        >
+          <AiOutlinePlayCircle className="w-24 h-24" />
+        </div>
       </div>
     </div>
-    </div>
-  );
+  </>
+);
+
 }
 
 export default Repeat;

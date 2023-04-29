@@ -15,10 +15,35 @@ onClose:() => void;
 }
 
 async function authenticateUser() {
-const {value} = emailRef.current as HTMLInputElement
-console.log(value)
-if(!value) return
+  setIsLoading(true)
+  const { value } = emailRef.current as HTMLInputElement
+  if(!value) return
+  const response = await fetch('http://localhost:3000/login', {
+    method:'POST', 
+    headers:{
+      'Content-Type':'application/json',
+      'Accept':'application/json'
+    },
+    body: JSON.stringify({
+      email: value
+    })
+  })
+  setIsLoading(false)
+  const data =  await response.json()
+  console.log(data)
+  
+  if(data?.message == 'Email sent'){
+      setSuccess(true)
+      return
+  }
+  setSuccess(false)
+} 
+
+
+async function newUser(){
 setIsLoading(true)
+const { value } = emailRef.current as HTMLInputElement
+if(!value) return
 const response = await fetch('http://localhost:3000/register', {
   method:'POST', 
   headers:{
@@ -38,28 +63,6 @@ if(data.message == 'Email sent'){
     return
 }
 setSuccess(false)
-} 
-
-
-async function newUser(){
-  setIsLoading(true)
-const { value } = emailRef.current as HTMLInputElement
-const url = new URL('http://localhost:3000/register')
-const response =  await fetch(url, {
-  method:'post', 
-  headers:{
-    'Content-Type': 'application/json',
-  }, 
-  body:JSON.stringify({
-    email:value
-  })
-})
-if(response.ok){
-  const data = await response.json()
-  console.log(data)
- }
- console.log(response)
- setIsLoading(false)
 }
 
   return (

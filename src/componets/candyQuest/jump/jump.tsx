@@ -3,6 +3,7 @@ import onstart from '../../../assets/image/onstart.png'
 import jump from   '../../../assets/image/jump.png'
 import obstackle from '../../../assets/image/obstackle.webp'
 import gum from   '../../../assets/image/54650f8684aafa0d7d00004c.webp'
+import { Helmet } from 'react-helmet';
 import walk from '../../../assets/image/walk.webp'
 import emoji from '../../../assets/image/initial.webp'
 import shadow from '../../../assets/image/535805e584aafa4e55000016.webp'
@@ -14,7 +15,7 @@ import { flushSync } from 'react-dom'
 
 type Program = { text: string; style: string | null }
 export type GameStatus = {text:string | null; type:'fail' | 'seccuss'}
-const eating = import.meta.glob('../../../assets/Eating/*')
+const eating = import.meta.glob('../../../assets/image/Eating/*')
 const imagesEating:string[] = []
 Object.keys(eating).forEach(key => {
   eating[key]().then((res) => {
@@ -24,7 +25,7 @@ Object.keys(eating).forEach(key => {
   })
 })
 
-const allimages = import.meta.glob('../../../assets/images/walking/*')
+const allimages = import.meta.glob('../../../assets/image/images/walking/*')
 const images:string[] = []
 Object.keys(allimages).forEach(key => {
   allimages[key]().then((res) => {
@@ -33,6 +34,11 @@ Object.keys(allimages).forEach(key => {
     images.push(path)
   })
 })
+
+
+function returnImages(){
+  return images
+}
 
 function Jump():JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,6 +50,7 @@ function Jump():JSX.Element {
   const dragItemsParent = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null)
   const emojiRef = useRef<HTMLDivElement>(null)
+  const [Images, setImages] = useState<string[]>([])
   const [item, setItem] = useState<'jump' | 'walk' | null>(null)
   const gumRef = useRef<HTMLButtonElement>(null)
   const dragedItemRef = useRef<HTMLElement | null>(null);
@@ -54,7 +61,7 @@ function Jump():JSX.Element {
   const [program, setProgram] = useState<Program[]>([{text:'onstart', style:null}]);
   const  dragItems:DragEventHandler = (e)  => {
     const element = e.target as HTMLImageElement
-    const blockName = element.src.split('/').slice(-1)[0].split(".")[0] as 'jump' | 'walk'
+    const blockName = element.id as 'jump' | 'walk'
     flushSync(() => setItem(blockName))
     dragedItemRef.current = e.target as HTMLElement
   }
@@ -200,11 +207,22 @@ function applyAnimation(keyFrames:Keyframe[]) {
   });
 }
 useEffect(() => {
+  const images = returnImages()
+  if(images.length){
+    setImages(images)
+  }
     setDots([1, 2, 3, 4])
 }, [])
-
   return (
-    <div className='w-screen playArea h-screen' onDragOver={(e) => e.preventDefault()} onDrop={() => deleteRef.current?.classList.add('invisible')}>
+<>{Images.length ? <Helmet>{Images.map(img => {
+  console.log(img)
+  return <link rel="preload" href={img} as="image" />
+ })
+
+  } </Helmet> : <></>
+
+ }
+<div className='w-screen playArea h-screen' onDragOver={(e) => e.preventDefault()} onDrop={() => deleteRef.current?.classList.add('invisible')}>
 
       {gameStatus.text && <ModalPart isOpen={isOpen} onClose={closeModal} gameStatus={gameStatus} /> }
     <div className="w-4/5 h-auto flex mx-auto flex-wrap justify-center responsive md:w-full">
@@ -219,12 +237,12 @@ useEffect(() => {
           onDragStart={dragItems}
           className="w-20"
         >
-          <img src={walk} alt="" className='w-full' />
+          <img id='walk' src={walk} alt="" className='w-full' />
         </button>
         <button  draggable={true}
           onDragStart={dragItems}
           className="w-20">
-        <img src={jump} alt="" />
+        <img id='jump' src={jump} alt="" />
         </button>
       </div>
       <div
@@ -236,6 +254,7 @@ useEffect(() => {
       >
        {
         program.map(({text}:{text:string, style:string | null}, i:number) => {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           return <div ref={(el) => blockesRef.current[i] = el!} onDragStart={(e) => {
             deleteRef.current?.classList.remove('invisible')
             setDeleteIndex(i)
@@ -270,7 +289,7 @@ useEffect(() => {
       </div>
     </div>
     </div>
-  );
+ </> );
 }
 
 export default Jump;

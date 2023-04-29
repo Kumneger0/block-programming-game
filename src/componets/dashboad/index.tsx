@@ -68,7 +68,12 @@ export default function Dashboard() {
               </div>
             </div>
             <div>
-              test
+            <button onClick={() => {
+              localStorage.removeItem('token')
+               location.reload()
+            }} className='bg-blue-600 text-white border-none rounded-md'>
+              Logout
+            </button>
             </div>
           </div>
           <div className="w-4/5 sm:w-11/12 flex justify-around mx-auto mt-4 items-center h-1/2 sm:flex-col sm:justify-center">
