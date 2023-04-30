@@ -1,6 +1,7 @@
 import onstart from '../../../assets/image/onstart.png'
 import gum from   '../../../assets/image/54650f8684aafa0d7d00004c.webp'
 import walk from '../../../assets/image/walk.webp'
+import {toast} from 'react-toastify'
 import { Helmet } from 'react-helmet';
 import LevelToggler from '../../levelToggler/levelToggler'
 import repeat from '../../../assets/image/reaptblock4.png'
@@ -123,6 +124,19 @@ const removeItem = (idx:number) => {
 }
 
 function startMoving() {
+  if(program.length <= 1){
+    toast.error('Please Connect The Blocks properly', {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      });
+    return
+  } 
     const childs = gameAreaRef.current?.childNodes as NodeListOf<HTMLElement>;
     const isReadyToStart = isProperlyAdded();
   

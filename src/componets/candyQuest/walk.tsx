@@ -1,6 +1,7 @@
 import './walk.css'
 import LevelToggler from '../levelToggler/levelToggler'
 import onstart from '../../assets/image/onstart.png'
+import {  toast } from 'react-toastify';
 import { Helmet } from 'react-helmet';
 import gum from   '../../assets/image/54650f8684aafa0d7d00004c.webp'
 import walk from '../../assets/image/walk.webp'
@@ -108,7 +109,19 @@ const removeItem = (idx:number) => {
 
 const targetNodePostions:{ele:number, x:number}[] = [];
 function startMoving(){
-  if(program.length <= 1) return
+  if(program.length <= 1){
+    toast.error('Please Connect Walk Block To On start Block', {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      });
+    return
+  } 
   const childs = gameAreaRef.current?.childNodes as NodeListOf<HTMLElement>
   const targetRect = childs[numberOfrequiredAnimation].getBoundingClientRect().x
   
@@ -318,6 +331,7 @@ setProgram(temp)
       </div>
     </div>
     </div>
+ 
   </>);
 }
 

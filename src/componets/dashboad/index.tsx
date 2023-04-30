@@ -1,6 +1,8 @@
 import styles from './dashboard.module.css';
 import { useState, createContext } from 'react';
 import Walk from '../candyQuest/walk';
+import { ToastContainer} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import dashboardImage from '../../assets/image/Z.webp'
 import dashboardImage2 from '../../assets/image/z2.webp'
 import dashboardImage3 from '../../assets/image/9k2.webp'
@@ -48,6 +50,18 @@ export default function Dashboard() {
             ) : (
               <Jump />
             )}
+               <ToastContainer
+position="top-center"
+autoClose={5000}
+hideProgressBar={false}
+newestOnTop={false}
+closeOnClick
+rtl={false}
+pauseOnFocusLoss
+draggable
+pauseOnHover
+theme="light"
+/>
           </levelcontext.Provider>
         )
       ) : (

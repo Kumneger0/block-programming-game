@@ -1,5 +1,6 @@
 import './jump.css'
 import onstart from '../../../assets/image/onstart.png'
+import {  toast } from 'react-toastify';
 import jump from   '../../../assets/image/jump.png'
 import obstackle from '../../../assets/image/obstackle.webp'
 import gum from   '../../../assets/image/54650f8684aafa0d7d00004c.webp'
@@ -50,8 +51,6 @@ function Jump():JSX.Element {
   const dragItemsParent = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null)
   const [itemTouch, setItemTouch] = useState<string | null>(null)
-  // const [walkPosition, setWalkPosition] = useState({x:0, y:0})
-  // const [jumpPosition, setJumpPosition] = useState({x:0, y:0})
   const emojiRef = useRef<HTMLDivElement>(null)
   const [Images, setImages] = useState<string[]>([])
   const [item, setItem] = useState<'jump' | 'walk' | null>(null)
@@ -102,6 +101,19 @@ const removeItem = (idx:number) => {
 let gumPosition=0
 let isCorrect = false;
 function startMoving() {
+  if(program.length <= 1){
+    toast.error('Please Connect The blocks properly', { 
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      });
+    return
+  } 
   const emojiPosition = getEmojiPosition();
   const { jumpIndex, walkIndex } = getJumpAndWalkIndices();
   const { jumpingPositions, walkingPositions } = getJumpingAndWalkingPositions(emojiPosition, jumpIndex, walkIndex);
