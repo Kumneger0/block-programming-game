@@ -44,7 +44,6 @@ function App(): JSX.Element {
      {/*@ts-ignore */}
     <Route path="/verify" element = {<Verify user = {user} setUser = {setUser} />} />
   </Routes>
- 
   </>
 }
 

@@ -11,20 +11,8 @@
     animation-fill-mode: forwards;
     animation-iteration-count: 1;
     animation-duration: 5s;
-    /* animation-play-state: running; */
     animation-timing-function: ease;
 }
-
-
-@keyframes moveToRight{
-    0%{
-        transform: translateX(0%)
-    } 
-    100%{
-        transform: translateX(410px);        
-    }
-}
-
 
 
 @media (width <= 768px){
@@ -43,10 +31,11 @@
 }
 
     .animationArea .dot{
-        width: 50px;
-        margin: 0 30px;
+        /* width: 50px; */
     }
     .animationArea .gum{
         margin: 0 10px;
     }
 }
+
+

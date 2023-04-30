@@ -6,7 +6,7 @@ import gum from   '../../assets/image/54650f8684aafa0d7d00004c.webp'
 import walk from '../../assets/image/walk.webp'
 import emoji from '../../assets/image/initial.webp'
 import shadow from '../../assets/image/535805e584aafa4e55000016.webp'
-import  React, { DragEventHandler, useRef, useState, useContext, useEffect } from "react"
+import { DragEventHandler, useRef, useState, useContext, useEffect } from "react"
 import { levelcontext } from '../dashboad'
 import { ModalPart } from '../modal/modal'
 import {AiOutlinePlayCircle} from 'react-icons/ai'
@@ -49,11 +49,12 @@ function Walk() {
   const dragItemsParent = useRef<HTMLDivElement>(null);
   const [Images, setImages] = useState<string[]>([])
   const imageRef = useRef<HTMLImageElement>(null)
-  const draggableItemRef = useRef<HTMLElement>(null)
+  const draggableItemRef = useRef<HTMLButtonElement>(null)
   const emojiRef = useRef<HTMLDivElement>(null)
   const gumRef = useRef<HTMLButtonElement>(null)
   const dragedItemRef = useRef<HTMLElement | null>(null);
   const deleteRef = useRef<HTMLDivElement>(null)
+  const [isMobile,  setIsMobile] = useState<boolean | null>(null)
   const [touchStartPosition, setTouchStartPosition] = useState<{x:number, y:number}>({x:0, y:0})
   const [elementStartPosition, setElementStartPosition]= useState<{x:number, y:number}>({x:0, y:0})
   const gameAreaRef = useRef<HTMLDivElement>(null)
@@ -97,6 +98,11 @@ function Walk() {
 
 const deleteItem = () => {
   const temp = [...program].filter((_program, i) => i !== deleteIndex)
+  setProgram(temp)
+}
+
+const removeItem = (idx:number) => {
+  const temp = [...program].filter((_program, i) => i !== idx)
   setProgram(temp)
 }
 
@@ -160,13 +166,16 @@ function applyAnimation(diffrence:number, duration:number, isLast:boolean){
   })
 }
 useEffect(() => {
-  if(level ==1){
+  if(level == 1){
     setDots([1, 2])
+    setnumberOfrequiredAnimation(2)
   }
   if(level == 2){
     setDots([1, 2, 3, 4])
     setnumberOfrequiredAnimation(4)
   }
+  const temp = [program[0]]
+  setProgram(temp)
 }, [level])
 
 
@@ -174,23 +183,26 @@ useEffect(() => {
 useEffect(() => {
  const images = returnImages()
   if(images.length){
-  console.log(images)
   setImages(images)
 }
+const details = navigator.userAgent;
+const regexp = /android|iphone|kindle|ipad/i;
+const isMobileDevice = regexp.test(details);
+setIsMobile(isMobileDevice)
 if(draggableItemRef.current){
   draggableItemRef.current.addEventListener('touchmove', handleTouchMove, { passive: false });
   draggableItemRef.current.addEventListener('touchend', handleTouchEnd, { passive: false });
   draggableItemRef.current.addEventListener('touchstart', handleTouchStart, { passive: false })
 }
 return () => {
-  draggableItemRef.current?.removeEventListener('touchmove', handleTouchMove, { passive: false });
-  draggableItemRef.current?.removeEventListener('touchend', handleTouchEnd, { passive: false });
-  draggableItemRef.current?.removeEventListener('touchstart', handleTouchStart, { passive: false })
+  draggableItemRef.current?.removeEventListener('touchmove', handleTouchMove, false);
+  draggableItemRef.current?.removeEventListener('touchend', handleTouchEnd, false);
+  draggableItemRef.current?.removeEventListener('touchstart', handleTouchStart, false)
 }
 }, [])
-function handleTouchMove(e:React.TouchEvent){
-  e.preventDefault();
-  const target = e.target as HTMLElement;
+function handleTouchMove(event:Event){
+  event.preventDefault();
+  const e = event as TouchEvent
   const deltaX = e.touches[0].clientX - touchStartPosition.x;
   const deltaY = e.touches[0].clientY - touchStartPosition.y;
    if(draggableItemRef.current){
@@ -198,8 +210,9 @@ function handleTouchMove(e:React.TouchEvent){
      draggableItemRef.current.style.top = elementStartPosition.y + deltaY + 'px';
    }
 }
-function handleTouchStart (e:React.TouchEvent){
-  e.preventDefault();
+function handleTouchStart (event:Event){
+  event.preventDefault();
+  const e = event as TouchEvent
   setTouchStartPosition({x: e.touches[0].clientX,
     y: e.touches[0].clientY})
     if(draggableItemRef.current){
@@ -211,7 +224,8 @@ function handleTouchStart (e:React.TouchEvent){
 }
 
 
-function handleTouchEnd(e: TouchEvent) {
+function handleTouchEnd(event:Event) {
+  const e = event as TouchEvent
   if (!draggableItemRef.current) return;
   const touch = e.changedTouches[0];
   const dropZone = dropZoneRef.current;
@@ -227,7 +241,7 @@ function handleTouchEnd(e: TouchEvent) {
 
 useEffect(() => {
   if(item  == null) return
-const temp = [...program, {text:'', style:Math.random().toString()},]
+ const temp = [...program, {text:'', style:Math.random().toString()},]
 setProgram(temp)
 }, [item])
   return (
@@ -241,7 +255,7 @@ setProgram(temp)
       <div className='absolute top-3 right-16'>
         <LevelToggler />
       </div>
-      {gameStatus.text && <ModalPart isOpen={isOpen} onClose={closeModal} gameStatus={gameStatus} /> }
+      {gameStatus.text && <ModalPart isOpen={isOpen} onClose={closeModal} gameStatus={gameStatus} shouldDisplayNext = {true} /> }
     <div className="w-4/5 h-auto flex mx-auto flex-wrap justify-center responsive">
       <div ref={deleteRef}  onDrop = {deleteItem} onDragOver={handleDragOver} className="delete w-48 h-full bg-slate-50 absolute left-0 flex justify-center items-center invisible">
         <div className='w-9'>
@@ -272,25 +286,28 @@ setProgram(temp)
             deleteRef.current?.classList.remove('invisible')
             setDeleteIndex(i)
             dragedItemRef.current = e.target as HTMLElement
-          }} draggable = {i !== 0 ? true : false}  key={i} className="w-24 -m-2 overflow-x-hidden dragged">
+          }} draggable = {i !== 0 ? true : false}  key={i} className="w-24 -m-2 overflow-x-hidden dragged relative">
             {text == 'onstart' ? <img src={onstart} alt="" className='w-auto m-0 p-0' />  : <img src={walk} alt="" className='w-auto m-0 p-0 dragged  border-white' />}
+            {i !== 0 && isMobile && <div onClick = {() => removeItem(i)} role = "button" className = 'absolute right-0 top-0 z-index-10 bg-black text-white'>
+              X
+            </div>}
           </div>
         })
        }
       </div>
     </div>
-    <div ref={gameAreaRef}  className="w-4/5 mx-auto flex justify-around animationArea">
+    <div ref={gameAreaRef}  className="w-4/5 mx-auto flex justify-around animationArea sm:-ml-3 sm:min-w-full sm:justify-center mt-3">
           <div className='character'>
         <div ref={emojiRef} className="w-24 -mt-4">
           <img ref={imageRef} src={emoji} alt="" className='w-full h-auto' />
         </div>
       </div>
-      {Dots.length > 0 && Dots.map((_dot, i) => <div key={i} className="dot w-6 h-6 rounded-full self-end">
-        <img src={shadow} alt="" />
+      {Dots.length > 0 && Dots.map((_dot, i) => <div key={i} className="dot w-6 h-6 rounded-full self-end sm:w-10 sm:h-10 sm:mx-3">
+        <img className='w-full' src={shadow} alt="" />
       </div> )
     }
-      <div className="w-1/2 sm:-ml-8">
-        <button ref={gumRef} className='w-8 h-8 -ml-16 sm:-ml-12 z-10'>
+      <div className="w-1/2 sm:-ml-8 -mt-4">
+        <button ref={gumRef} className='w-8 h-8 -ml-16 sm:-ml-2 z-10'>
           <img src={gum} alt="" />
         </button>
       </div>

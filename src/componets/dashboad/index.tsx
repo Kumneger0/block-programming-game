@@ -51,19 +51,17 @@ export default function Dashboard() {
           </levelcontext.Provider>
         )
       ) : (
-        <div className={`${styles.container} w-screen h-screen`}>
-          <div className='fixed top-4 right-10'>
-          </div>
+        <div className={`${styles.container} w-screen min-h-screen h-auto -mt-2 overflow-x-hidden`}>
           <div className={`w-4/5 mx-auto sm:w-11/12 flex mt-2 justify-between`}>
-            <div className="flex gap-2">
-              <div className="circle w-24 h-24 rounded-full ">
+            <div className="flex gap-2 mt-2">
+              <div className="circle sm:w-14 sm:24 w-24 h-24 rounded-full ">
                 <img src={dashboardImage} alt="" className='w-36 h-auto rounded-full' />
               </div>
-              <div className="circle w-24 h-24 rounded-full ">
+              <div className="circle sm:w-14 sm:24 w-24 h-24 rounded-full ">
               <img src={dashboardImage2} alt="" className='w-36 h-auto rounded-full' />
 
               </div>
-              <div className="circle w-24 h-24 rounded-full ">
+              <div className="circle sm:w-14 sm:24 w-24 h-24 rounded-full ">
               <img src={dashboardImage3} alt="" className='w-36 h-auto rounded-full' />
               </div>
             </div>
@@ -71,31 +69,32 @@ export default function Dashboard() {
             <button onClick={() => {
               localStorage.removeItem('token')
                location.reload()
-            }} className='bg-blue-600 text-white border-none rounded-md'>
+            }} className='bg-blue-600 text-white border-none rounded-md p-3'>
               Logout
             </button>
             </div>
           </div>
-          <div className="w-4/5 sm:w-11/12 flex justify-around mx-auto mt-4 items-center h-1/2 sm:flex-col sm:justify-center">
-            <div className='md:w-1/2 mt-3'>
-              <img className='w-4/5 mx-auto' src={dashboardImg} alt="" />
+          <div className="w-4/5 sm:w-11/12 flex justify-around mx-auto mt-4 items-center h-auto sm:flex-col sm:justify-center">
+            <div className='md:w-11/12 mt-3 sm:w-screen mx-auto'>
+              <img className='w-4/5 sm:w-full' src={dashboardImg} alt="" />
             </div>
             <div className="flex flex-col w-1/2 gap-2 items-end sm:items-center">
-              <div className="w-1/2 text-center">Lessons</div>
+              <div className="w-1/2 text-center sm:w-4/5">Lessons</div>
               <button
                 onClick={() => playGame(1, 'WALK')}
-                className="bg-yellow-200 p-1 w-1/2 border-2 border-red-400 hover:bg-yellow-400"
+                className="bg-yellow-200 p-1 w-1/2 border-2 sm:w-full border-red-400 hover:bg-yellow-400"
               >
                 3 Lessons 
               </button>
               <button
                 onClick={() => playGame(2, 'JUMP')}
-                className="bg-yellow-200 p-1 w-1/2 border-2 border-green-500 hover:bg-yellow-400"
+                className="bg-yellow-200 p-1 sm:w-full  w-1/2 border-2 border-green-500 hover:bg-yellow-400"
               >
                 1 Lesson
               </button>
             </div>
           </div>
+       
         </div>
       )}
     </>

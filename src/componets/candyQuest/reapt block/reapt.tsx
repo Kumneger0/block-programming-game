@@ -1,4 +1,3 @@
-// import './walk.css'
 import onstart from '../../../assets/image/onstart.png'
 import gum from   '../../../assets/image/54650f8684aafa0d7d00004c.webp'
 import walk from '../../../assets/image/walk.webp'
@@ -26,7 +25,7 @@ const images:string[] = []
 
 Object.keys(eating).forEach(key => {
   eating[key]().then((res) => {
-    //@ts-expect-error b/c no types available
+    //@ts-expect-error no types available
     const path = res.default
     imagesEating.push(path)
   })
@@ -34,7 +33,7 @@ Object.keys(eating).forEach(key => {
 
 Object.keys(allimages).forEach(key => {
   allimages[key]().then((res) => {
-    //@ts-expect-error b/c no types available
+    //@ts-expect-error no types available
     const path = res.default
     images.push(path)
   })
@@ -58,10 +57,10 @@ const [item, setItem] = useState<'reaptblock4' | 'walk' | null>(null)
   const dragItemsParent = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null)
   const [Images, setImages] = useState<string[]>([])
-  const draggableItemRef2 = useRef<HTMLElement>(null)
+  const draggableItemRef2 = useRef<HTMLButtonElement>(null)
   const [touchStartPosition, setTouchStartPosition] = useState<{x:number, y:number}>({x:0, y:0})
   const [elementStartPosition, setElementStartPosition]= useState<{x:number, y:number}>({x:0, y:0})
-  const draggableItemRef1 = useRef<HTMLElement>(null)
+  const draggableItemRef1 = useRef<HTMLButtonElement>(null)
   const emojiRef = useRef<HTMLDivElement>(null)
   const gumRef = useRef<HTMLButtonElement>(null)
   const dragedItemRef = useRef<HTMLElement | null>(null);
@@ -69,7 +68,8 @@ const [item, setItem] = useState<'reaptblock4' | 'walk' | null>(null)
   const gameAreaRef = useRef<HTMLDivElement>(null)
   const [deleteIndex, setDeleteIndex]  = useState<number>()
   const dropZoneRef = useRef<HTMLDivElement>(null);
-  const [name, setName] = useState<string>(null)
+  const [name, setName] = useState<string | null>(null)
+
   const shouldDropRef = useRef<boolean | null>(null)
   const [program, setProgram] = useState<Program[]>([{text:'onstart', style:null, isWalkAdded:false}]);
   const  dragItems:DragEventHandler = (e)  => {
@@ -115,6 +115,13 @@ const deleteItem = () => {
   const temp = [...program].filter((_program, i) => i !== deleteIndex)
   setProgram(temp)
 }
+
+
+const removeItem = (idx:number) => {
+  const temp = [...program].filter((_program, i) => i !== idx)
+  setProgram(temp)
+}
+
 function startMoving() {
     const childs = gameAreaRef.current?.childNodes as NodeListOf<HTMLElement>;
     const isReadyToStart = isProperlyAdded();
@@ -202,25 +209,16 @@ useEffect(() => {
 
 useEffect(() => {
 if(name == null) return
+const item = name.split(' ')[0]
 const temp = [...program]
 const lastItem = temp[temp.length - 1]
-if(name == 'walk' &&  lastItem?.text == 'reaptblock4' && !lastItem.isWalkAdded){
+if(item == 'walk' &&  lastItem?.text == 'reaptblock4' && !lastItem.isWalkAdded){
  temp[temp.length-1].isWalkAdded = true
  setProgram(temp)
 }else{
-  temp.push({text:name as string, style:null, isWalkAdded:false})
+  temp.push({text:item as string, style:null, isWalkAdded:false})
   setProgram(temp)
 }
-   if(name  == 'walk'){
-     draggableItemRef2.current.style.left = touchStartPosition.x + 'px'
-     draggableItemRef2.current.style.top = touchStartPosition.y + 'px'
-   }
-   if(name == 'reaptblock4'){
-     draggableItemRef1.current.style.left = touchStartPosition.x + 'px'
-     draggableItemRef1.current.style.top = touchStartPosition.y + 'px'
-   }
-   setTouchStartPosition({x:0, y:0}) 
-   setElementStartPosition({x:0, y:0})
 }, [name])
 
 
@@ -232,11 +230,12 @@ useEffect(() => {
   }
   document.body.classList.add('overflow-x-hidden');
 
-  const handleTouchMoveWrapper = (e) => handleTouchMove(e, { passive: false });
-  const handleTouchEndWrapper = (e) => handleTouchEnd(e, { passive: false });
-  const handleTouchStartWrapper = (e) => handleTouchStart(e, { passive: false });
+  const handleTouchMoveWrapper = (e:Event) => handleTouchMove(e, { passive: false });
+  const handleTouchEndWrapper = (e:Event) => handleTouchEnd(e, { passive: false });
+  const handleTouchStartWrapper = (e:Event) => handleTouchStart(e, { passive: false });
 
   if (draggableItemRef1.current && draggableItemRef2.current) {
+ 
     draggableItemRef1.current.addEventListener('touchmove', handleTouchMoveWrapper);
     draggableItemRef1.current.addEventListener('touchend', handleTouchEndWrapper);
     draggableItemRef1.current.addEventListener('touchstart', handleTouchStartWrapper);
@@ -256,18 +255,17 @@ useEffect(() => {
 }, []);
 
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function handleTouchMove(e:React.TouchEvent, _options:{passive:false}){
-  e.preventDefault();
+function handleTouchMove(event:Event, _options:{passive:false}){
+  event.preventDefault();
+  const e = event as TouchEvent
   const target = e.target as HTMLElement;
   const deltaX = e.touches[0].clientX - touchStartPosition.x;
   const deltaY = e.touches[0].clientY - touchStartPosition.y;
-  const DOMRect = dropZoneRef.current?.lastElementChild?.getBoundingClientRect() as DOMRect;
-  const draggDOMrect = dropZoneRef.current?.lastElementChild?.getBoundingClientRect()
   const touch = e.changedTouches[0];
   const dropZone = dropZoneRef.current;
   const element = document.elementFromPoint(touch.clientX, touch.clientY);
   if(dropZone === element){
+    if(dropZone)
     dropZone.style.background = 'green';
     shouldDropRef.current = true;
   }else{
@@ -288,8 +286,16 @@ else{
 }
 
 }
-function handleTouchStart (e:React.TouchEvent){
-  e.preventDefault();
+
+  type NewType = {
+    passive: boolean;
+  };
+
+  type NewType_1 = NewType;
+
+function handleTouchStart (event:Event, _options: NewType_1): void{
+  event.preventDefault();
+  const e = event as TouchEvent
   const target = e.target as HTMLElement
   const id = target.id
   if(id == 'reaptblock4'){
@@ -316,18 +322,28 @@ function handleTouchStart (e:React.TouchEvent){
 }
 
 
-function handleTouchEnd(e: TouchEvent) {
+
+function handleTouchEnd(event: Event, _options: { passive: boolean; }) {
+  const e = event as TouchEvent
   const target = e.target as HTMLElement
   const touch = e.changedTouches[0];
-  const dropZone = dropZoneRef.current;
+  const dropZone = dropZoneRef.current as HTMLDivElement;
   dropZone.style.background = 'initial'
   const element = document.elementFromPoint(touch.clientX, touch.clientY);
   if (element === dropZone) {
    flushSync(() => setItem(target.id as 'reaptblock4' | 'walk'))
   }
   if(shouldDropRef.current){
-     setName(target.id)
+     setName(prv => prv == target.id ? target.id + ' ' + target.id : target.id)
   }
+  if(draggableItemRef1.current && draggableItemRef2.current){
+  draggableItemRef1.current.style.left = 30 + 'px'
+  draggableItemRef1.current.style.top = 100 + 'px'
+  draggableItemRef2.current.style.left = 30 + 'px'
+  draggableItemRef2.current.style.top = 50 + 'px'
+  }
+  setElementStartPosition({x:0, y:0})
+  setTouchStartPosition({x:0, y:0})
 }
 
 return (
@@ -342,7 +358,7 @@ return (
       <></>
     )}
     <div
-      className="w-screen playArea h-screen"
+      className="w-screen playArea h-screen overflow-x-hidden"
       onDragOver={(e) => e.preventDefault()}
       onDrop={() => deleteRef.current?.classList.add("invisible")}
     >
@@ -354,6 +370,7 @@ return (
           isOpen={isOpen}
           onClose={closeModal}
           gameStatus={gameStatus}
+          shouldDisplayNext = {true}
         />
       )}
       <div className="w-4/5 h-auto flex mx-auto flex-wrap justify-center responsive">
@@ -397,6 +414,7 @@ return (
               text={text}
               isWalkAdded={isWalkAdded}
               index={i}
+              removeItem={removeItem}
               blockRef={(el: HTMLDivElement) => (blockesRef.current[i] = el!)}
               onDragStart={(e: React.DragEvent) => {
                 deleteRef.current?.classList.remove("invisible");
@@ -409,7 +427,7 @@ return (
       </div>
       <div
         ref={gameAreaRef}
-        className="w-4/5 mx-auto flex justify-around animationArea"
+        className="w-4/5 mx-auto flex justify-around animationArea sm:-ml-3 sm:min-w-full sm:justify-center"
       >
         <div className="character">
           <div ref={emojiRef} className="w-24 -mt-4">
@@ -418,12 +436,12 @@ return (
         </div>
         {Dots.length > 0 &&
           Dots.map((_dot, i) => (
-            <div key={i} className="dot w-6 h-6 rounded-full self-end">
+            <div key={i} className="dot w-6 h-6 rounded-full self-end sm:w-10 sm:h-10 sm:mx-3">
               <img src={shadow} alt="" />
             </div>
           ))}
-        <div className="w-1/2">
-          <button ref={gumRef} className="w-8 h-8 -ml-16 md:-ml-12 z-10">
+        <div className="w-1/2 sm:-ml-8 -mt-4">
+          <button ref={gumRef} className="w-8 h-8 -ml-16 sm:-ml-2 z-10'">
             <img src={gum} alt="" />
           </button>
         </div>
@@ -449,11 +467,12 @@ interface IProgram {
     text:string
     isWalkAdded:boolean
     index:number,
+    removeItem:(number:number)=> void
     blockRef:LegacyRef<HTMLDivElement>
     onDragStart:DragEventHandler
 }
 
-const ProgramBlock = ({ text, isWalkAdded, index, blockRef, onDragStart }:IProgram) => {
+const ProgramBlock = ({ text, isWalkAdded, index, blockRef, onDragStart , removeItem}:IProgram) => {
   const getImageSource = () => {
     if (text === 'onstart') {
       return onstart;
@@ -466,15 +485,30 @@ const ProgramBlock = ({ text, isWalkAdded, index, blockRef, onDragStart }:IProgr
     }
   };
 
+
+
+
+  const [isMobile,  setIsMobile] = useState<boolean | null>(null)
+
+  useEffect(() =>{
+    const details = navigator.userAgent;
+    const regexp = /android|iphone|kindle|ipad/i;
+    const isMobileDevice = regexp.test(details);
+    setIsMobile(isMobileDevice)
+  }, [])
+
   return (
     <div
       ref={blockRef}
       onDragStart={onDragStart}
       draggable={index !== 0}
       key={index}
-      className="w-24 -m-2 overflow-x-hidden dragged"
+      className="w-24 -m-2 overflow-x-hidden dragged relative"
     >
       <img src={getImageSource()} alt="" className="w-auto m-0 p-0 dragged border-white" />
+      {index !== 0 && isMobile  && <div onClick = {() => removeItem(index)} role = "button" className = 'absolute right-0 top-0 z-index-10 bg-black text-white'>
+              X
+            </div>}
     </div>
   );
 };

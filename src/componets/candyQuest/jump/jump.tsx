@@ -49,13 +49,21 @@ function Jump():JSX.Element {
 
   const dragItemsParent = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null)
+  const [itemTouch, setItemTouch] = useState<string | null>(null)
+  // const [walkPosition, setWalkPosition] = useState({x:0, y:0})
+  // const [jumpPosition, setJumpPosition] = useState({x:0, y:0})
   const emojiRef = useRef<HTMLDivElement>(null)
   const [Images, setImages] = useState<string[]>([])
   const [item, setItem] = useState<'jump' | 'walk' | null>(null)
   const gumRef = useRef<HTMLButtonElement>(null)
   const dragedItemRef = useRef<HTMLElement | null>(null);
   const deleteRef = useRef<HTMLDivElement>(null)
+  const [isMobile, setIsMobile] = useState<boolean | null>(null)
+  const  draggabele1 =  useRef<HTMLButtonElement | null>(null)
+  const  draggabele2 =  useRef<HTMLButtonElement | null>(null)
   const gameAreaRef = useRef<HTMLDivElement>(null)
+  const [touchStartPosition, setTouchStartPosition] = useState({x: 0, y: 0})
+  const [elementStartPosition, setElementStartPosition] = useState({x: 0, y: 0})
   const [deleteIndex, setDeleteIndex]  = useState<number>()
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const [program, setProgram] = useState<Program[]>([{text:'onstart', style:null}]);
@@ -84,8 +92,12 @@ function Jump():JSX.Element {
   };
 
 const deleteItem = () => {
-  const temp = [...program].filter((_program, i) => i !== deleteIndex)
-  setProgram(temp)
+     const temp = [...program].filter((_program, i) => i !== deleteIndex)
+    setProgram(temp) 
+}
+const removeItem = (idx:number) => {
+  const temp = [...program].filter((_program, i) => i !== idx)
+    setProgram(temp) 
 }
 let gumPosition=0
 let isCorrect = false;
@@ -133,9 +145,13 @@ function getJumpingAndWalkingPositions(emojiPosition:number, jumpIndex:number[],
    gumPosition = childs[childs.length - 2].getBoundingClientRect().x
   const jumpingPositions:{x:number, isJump:boolean}[] = []
   const walkingPositions:{x:number, isJump:boolean}[] = []
-
+  let shouldContinue = true
   childs.forEach((child, i) => {
     if (jumpIndex.includes(i)) {
+     if(!shouldContinue) return
+      if(i !== 3){
+        shouldContinue = false
+      }
       if(i == 3){
         isCorrect = true
       }
@@ -194,6 +210,9 @@ function applyAnimation(keyFrames:Keyframe[]) {
           if(isGameOver){
             if(gumRef.current == null) return
             gumRef.current.style.display = 'none'
+            if(imageRef.current){
+             imageRef.current.src = emoji
+            }
             setTimeout(() => {
               setGameStatus({text:"good", type:'seccuss'})
               setIsOpen(true)
@@ -212,20 +231,105 @@ useEffect(() => {
     setImages(images)
   }
     setDots([1, 2, 3, 4])
+   draggabele1.current?.addEventListener('touchstart', handleTouchStart, {passive:false})
+   draggabele1.current?.addEventListener('touchmove', handleTouchMove, {passive:false})
+   draggabele1.current?.addEventListener('touchend', handleTouchEnd, {passive:false})
+   draggabele2.current?.addEventListener('touchstart', handleTouchStart, {passive:false})
+   draggabele2.current?.addEventListener('touchmove', handleTouchMove, {passive:false})
+   draggabele2.current?.addEventListener('touchend', handleTouchEnd, {passive:false})
+   const details = navigator.userAgent;
+   const regexp = /android|iphone|kindle|ipad/i;
+   const isMobileDevice = regexp.test(details);
+   setIsMobile(isMobileDevice)
+   return () => {
+    draggabele1.current?.removeEventListener('touchstart', handleTouchStart, false)
+   draggabele1.current?.removeEventListener('touchmove', handleTouchMove, false)
+   draggabele1.current?.removeEventListener('touchend', handleTouchEnd, false)
+   draggabele2.current?.removeEventListener('touchstart', handleTouchStart, false)
+   draggabele2.current?.removeEventListener('touchmove', handleTouchMove, false)
+   draggabele2.current?.removeEventListener('touchend', handleTouchEnd, false)
+   }
 }, [])
+
+
+function handleTouchStart(evt:Event){
+  evt.preventDefault();
+  const e = evt as TouchEvent
+  console.log(e.target)
+  setTouchStartPosition({x: e.touches[0].clientX,
+    y: e.touches[0].clientY})
+    const target = e.target as HTMLElement
+    const id  = target.id
+  
+    if(id == 'walk' && draggabele1.current){
+      setElementStartPosition({
+        x: parseInt(draggabele1.current.style.left) || 0,
+        y: parseInt(draggabele1.current.style.top) || 0
+      })
+    }
+    if(id == 'jump' && draggabele2.current){
+      setElementStartPosition({
+        x: parseInt(draggabele2.current.style.left) || 0,
+        y: parseInt(draggabele2.current.style.top) || 0
+      })
+    }
+}
+function handleTouchMove(evt:Event){
+  evt.preventDefault();
+  const e = evt as TouchEvent
+  const target = e.target as HTMLElement;
+  const id = target.id
+  const deltaX = e.touches[0].clientX - touchStartPosition.x;
+  const deltaY = e.touches[0].clientY - touchStartPosition.y;
+   if(id == 'walk' && draggabele2.current){
+      draggabele2.current.style.left = elementStartPosition.x + deltaX + 'px';
+      draggabele2.current.style.top = elementStartPosition.y + deltaY + 'px';
+   }
+   if(id == 'jump' && draggabele1.current){
+      draggabele1.current.style.left = elementStartPosition.x + deltaX + 'px';
+      draggabele1.current.style.top = elementStartPosition.y + deltaY + 'px';
+   }
+}
+
+
+function handleTouchEnd(evt:Event) {
+ evt.preventDefault()
+const e = evt as TouchEvent
+ const touch = e.changedTouches[0];
+ const target = e.target as HTMLElement;
+ const dropZone = dropZoneRef.current;
+ const element = document.elementFromPoint(touch.clientX, touch.clientY);
+ if (element === dropZone) {
+  setItemTouch(target.id as "walk" | "jump")
+ }
+ if(draggabele1.current && draggabele2.current){
+   draggabele1.current.style.left = touchStartPosition.x + 'px'
+   draggabele1.current.style.top = touchStartPosition.y + 'px'
+   draggabele2.current.style.left = touchStartPosition.x + 'px'
+   draggabele2.current.style.top = touchStartPosition.y + 'px'
+ }
+ setTouchStartPosition({x:0, y:0})
+ setElementStartPosition({x:0, y:0})
+}
+
+useEffect(() => { 
+if(itemTouch == null) return
+const temp = [...program]
+temp.push({text:itemTouch as string, style:null})
+setProgram(temp)
+}, [itemTouch])
   return (
 <>{Images.length ? <Helmet>{Images.map(img => {
-  console.log(img)
   return <link rel="preload" href={img} as="image" />
  })
 
   } </Helmet> : <></>
 
  }
-<div className='w-screen playArea h-screen' onDragOver={(e) => e.preventDefault()} onDrop={() => deleteRef.current?.classList.add('invisible')}>
+<div className='w-screen playArea h-screen overflow-x-hidden' onDragOver={(e) => e.preventDefault()} onDrop={() => deleteRef.current?.classList.add('invisible')}>
 
-      {gameStatus.text && <ModalPart isOpen={isOpen} onClose={closeModal} gameStatus={gameStatus} /> }
-    <div className="w-4/5 h-auto flex mx-auto flex-wrap justify-center responsive md:w-full">
+      {gameStatus.text && <ModalPart isOpen={isOpen} onClose={closeModal} gameStatus={gameStatus} shouldDisplayNext = {false} /> }
+    <div className="w-4/5 h-auto flex mx-auto flex-wrap justify-center responsive md:w-full overflow-x-hidden">
       <div ref={deleteRef}  onDrop = {deleteItem} onDragOver={handleDragOver} className="delete w-48 h-full bg-slate-50 absolute left-0 flex justify-center items-center invisible">
         <div className='w-9'>
             <RiDeleteBinFill className = 'w-full h-auto' />
@@ -235,13 +339,16 @@ useEffect(() => {
         <button
           draggable={true}
           onDragStart={dragItems}
-          className="w-20"
+          className="w-20 relative select-none"
+          ref = {draggabele2}
         >
           <img id='walk' src={walk} alt="" className='w-full' />
         </button>
-        <button  draggable={true}
+        <button draggable={true}
           onDragStart={dragItems}
-          className="w-20">
+          className="w-20 relative select-none"
+          ref = {draggabele1}
+          >
         <img id='jump' src={jump} alt="" />
         </button>
       </div>
@@ -259,26 +366,32 @@ useEffect(() => {
             deleteRef.current?.classList.remove('invisible')
             setDeleteIndex(i)
             dragedItemRef.current = e.target as HTMLElement
-          }} draggable = {i !== 0 ? true : false}  key={i} className="w-24 -m-2 overflow-x-hidden dragged">
+          }} draggable = {i !== 0 ? true : false}  key={i} className="w-24 -m-2 overflow-x-hidden dragged relative">
             {text == 'onstart' ? <img src={onstart} alt="" className='w-auto m-0 p-0' />  :  <img src={text == 'walk' ? walk : jump} alt="" className='w-auto m-0 p-0 dragged  border-white' />}
+           {i !== 0 && isMobile && <div onClick = {() => removeItem(i)} role = "button" className = 'absolute right-0 top-0 z-index-10 bg-black text-white'>
+              X
+            </div>}
           </div>
         })
        }
       </div>
     </div>
-    <div ref={gameAreaRef}  className="w-4/5 mx-auto flex justify-around animationArea md:w-11/12">
+    <div ref={gameAreaRef}  className="w-4/5 mx-auto flex justify-around animationArea sm:-ml-3 sm:min-w-full sm:justify-center mt-3 relative">
           <div className='character'>
         <div ref={emojiRef} className="w-24 -mt-4">
           <img ref={imageRef} src={emoji} alt="" className='w-full h-auto' />
         </div>
       </div>
-      {Dots.length > 0 && Dots.map((_dot, i) => <div key={i} className="dot w-6 h-6 rounded-full self-end">
-        <img src={shadow} alt="" className={i == 1 ? 'sm:-mt-1 sm:-ml-6 w-6' : ''} />
-        {i == 1 && <img src = {obstackle} className='ml-10 -mt-6 sm:-mt-10 w-16' />}
-      </div> )
+      {Dots.length > 0 && Dots.map((_dot, i) => <div key={i} className="dot w-6 h-6 rounded-full self-end sm:w-10 sm:h-10 sm:mx-3">
+       {i !== 2 ?  <img src={shadow} alt=""  /> :
+      <div className='flex justify-between items-start'>
+        <img className='-ml-5 -mt-2' src = {obstackle} />
+        <img src={shadow} alt=""  />
+        </div>
+ } </div> )
     }
       <div className="w-1/2">
-        <button ref={gumRef} className='w-8 h-8 -ml-16 sm:-ml-12 z-10'>
+        <button ref={gumRef} className='w-8 h-8 -ml-12 sm:-ml-1 z-10'>
           <img src={gum} alt="" />
         </button>
       </div>

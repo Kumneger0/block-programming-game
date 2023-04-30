@@ -4,10 +4,11 @@ import { flushSync } from 'react-dom';
 import { levelcontext } from '../dashboad';
 import type { GameStatus } from '../candyQuest/walk';
 
-export const ModalPart = ({ isOpen, onClose, gameStatus }:{
+export const ModalPart = ({ isOpen, onClose, gameStatus, shouldDisplayNext }:{
 isOpen: boolean
 onClose:() => void;
 gameStatus:GameStatus;
+shouldDisplayNext?: boolean;
 }) => {
 
   
@@ -37,7 +38,7 @@ const loadNextLesson = () => {
 
         <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
           <div className="px-4 py-5 sm:p-6">
-            <h2 className="text-xl font-bold mb-4">{gameStatus.type == 'seccuss' ? 'secussesfully finished' : 'OOPS'}</h2>
+            <h2 className="text-xl font-bold mb-4">{gameStatus.type == 'seccuss' ? 'successfully finished' : 'OOPS'}</h2>
             <p className="mb-4">{gameStatus.text}</p>
             <button
               type="button"
@@ -46,7 +47,7 @@ const loadNextLesson = () => {
             >
               replay
             </button>
-            {gameStatus.type == 'seccuss' && level && level !== 3 &&
+            {gameStatus.type == 'seccuss' && level && level !== 3 &&  shouldDisplayNext &&
             <button
               type="button"
               className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 ml-4"
