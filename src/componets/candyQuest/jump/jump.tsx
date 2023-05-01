@@ -102,7 +102,7 @@ let gumPosition=0
 let isCorrect = false;
 function startMoving() {
   if(program.length <= 1){
-    toast.error('Please Connect The blocks properly', { 
+    toast.error('Please Connect The blocks ', { 
       position: "top-center",
       autoClose: 5000,
       hideProgressBar: false,
@@ -312,7 +312,7 @@ const e = evt as TouchEvent
  const dropZone = dropZoneRef.current;
  const element = document.elementFromPoint(touch.clientX, touch.clientY);
  if (element === dropZone) {
-  setItemTouch(target.id as "walk" | "jump")
+  setItemTouch(prv => prv == target.id ? target.id + ' ' + target.id : target.id)
  }
  if(draggabele1.current && draggabele2.current){
    draggabele1.current.style.left = touchStartPosition.x + 'px'
@@ -326,13 +326,14 @@ const e = evt as TouchEvent
 
 useEffect(() => { 
 if(itemTouch == null) return
+const item = itemTouch.split(' ')[0]
 const temp = [...program]
-temp.push({text:itemTouch as string, style:null})
+temp.push({text:item as string, style:null})
 setProgram(temp)
 }, [itemTouch])
   return (
 <>{Images.length ? <Helmet>{Images.map(img => {
-  return <link rel="preload" href={img} as="image" />
+  return <link key={img} rel="preload" href={img} as="image" />
  })
 
   } </Helmet> : <></>

@@ -171,13 +171,15 @@ function applyAnimation(diffrence:number, duration:number, isLast:boolean){
       blockesRef.current[i].style.border = '2px solid #fff'
       }
       else{
-        blockesRef.current[i].style.border = 'none'
+        if(blockesRef.current[i]?.style){
+           blockesRef.current[i].style.border = 'none'
+        }
       }
     })
     }, 100)
     animation.finished.then(() =>{
       clearInterval(interval1)
-      if(blockesRef.current){
+      if(blockesRef.current[blockesRef.current.length - 1]){
         blockesRef.current[blockesRef.current.length - 1].style.border = 'none'
       }
       if(isLast){
@@ -188,6 +190,9 @@ function applyAnimation(diffrence:number, duration:number, isLast:boolean){
             imageRef.current.src = emoji
            }
            setTimeout(() => {
+            const levelStatus = JSON.parse(localStorage.getItem('level-status') as string) ?? {completed:[]}
+           levelStatus.completed.push(level)
+           localStorage.setItem("level-status", JSON.stringify(levelStatus))
             setGameStatus({text:'you are reached', type:'seccuss'})
             setIsOpen(true)
            }, 500)

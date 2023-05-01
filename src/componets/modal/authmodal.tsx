@@ -47,8 +47,7 @@ async function authenticateUser() {
   })
   setIsLoading(false)
   const data =  await response.json()
-  
-
+  console.log(data)
   if(data.message == 'User not found'){
     setIsLoading('initial')
     toast.error('No User Found With this Email Address', {

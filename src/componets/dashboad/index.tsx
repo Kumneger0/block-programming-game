@@ -98,13 +98,13 @@ theme="light"
                 onClick={() => playGame(1, 'WALK')}
                 className="bg-yellow-200 p-1 w-1/2 border-2 sm:w-full border-red-400 hover:bg-yellow-400"
               >
-                3 Lessons 
+                Lesson 1
               </button>
               <button
                 onClick={() => playGame(2, 'JUMP')}
                 className="bg-yellow-200 p-1 sm:w-full  w-1/2 border-2 border-green-500 hover:bg-yellow-400"
               >
-                1 Lesson
+                Lesson 2
               </button>
             </div>
           </div>

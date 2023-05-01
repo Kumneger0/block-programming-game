@@ -125,7 +125,7 @@ const removeItem = (idx:number) => {
 
 function startMoving() {
   if(program.length <= 1){
-    toast.error('Please Connect The Blocks properly', {
+    toast.error('Please Connect The Blocks ', {
       position: "top-center",
       autoClose: 5000,
       hideProgressBar: false,
