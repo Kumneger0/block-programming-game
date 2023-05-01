@@ -21,7 +21,6 @@ async function authenticateUser() {
   const { value } = emailRef.current as HTMLInputElement
   if(!value) return
   const isValidEmail = checkEmail(value)
-  console.log(isValidEmail)
   if(!isValidEmail){
      setIsLoading('initial')
      toast.error('Please Enter Valid Email Address', {
@@ -51,8 +50,17 @@ async function authenticateUser() {
   
 
   if(data.message == 'User not found'){
-    setErrorMessage('no user found with email address')
-    setSuccess(false)
+    setIsLoading('initial')
+    toast.error('No User Found With this Email Address', {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      });
     return
   }
   
