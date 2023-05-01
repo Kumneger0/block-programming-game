@@ -1,21 +1,21 @@
 import './walk.css'
-import LevelToggler from '../levelToggler/levelToggler'
-import onstart from '../../assets/image/onstart.png'
+import LevelToggler from '../../levelToggler/levelToggler'
+import onstart from '../../../assets/image/onstart.png'
 import {  toast } from 'react-toastify';
 import { Helmet } from 'react-helmet';
-import gum from   '../../assets/image/54650f8684aafa0d7d00004c.webp'
-import walk from '../../assets/image/walk.webp'
-import emoji from '../../assets/image/initial.webp'
-import shadow from '../../assets/image/535805e584aafa4e55000016.webp'
+import gum from   '../../../assets/image/54650f8684aafa0d7d00004c.webp'
+import walk from '../../../assets/image/walk.webp'
+import emoji from '../../../assets/image/initial.webp'
+import shadow from '../../../assets/image/535805e584aafa4e55000016.webp'
 import { DragEventHandler, useRef, useState, useContext, useEffect } from "react"
-import { levelcontext } from '../dashboad'
-import { ModalPart } from '../modal/modal'
+import { levelcontext } from '../../dashboad'
+import { ModalPart } from '../../modal/modal'
 import {AiOutlinePlayCircle} from 'react-icons/ai'
 import {RiDeleteBinFill} from 'react-icons/ri'
 
 type Program = { text: string; style: string | null }
 export type GameStatus = {text:string | null; type:'fail' | 'seccuss'}
-const eating = import.meta.glob('../../assets/image/Eating/*')
+const eating = import.meta.glob('../../../assets/image/Eating/*')
 const imagesEating:string[] = []
 Object.keys(eating).forEach(key => {
   eating[key]().then((res) => {
@@ -25,7 +25,7 @@ Object.keys(eating).forEach(key => {
   })
 })
 
-const allimages = import.meta.glob('../../assets/image/images/walking/*')
+const allimages = import.meta.glob('../../../assets/image/images/walking/*')
 const images:string[] = []
 Object.keys(allimages).forEach(key => {
   allimages[key]().then((res) => {
@@ -121,7 +121,13 @@ function startMoving(){
       theme: "light",
       });
     return
-  } 
+  }
+  if(program.length >= numberOfrequiredAnimation + 2){
+    const childs = gameAreaRef.current?.childNodes as NodeListOf<HTMLElement>
+    const target = childs[childs.length - 1].getBoundingClientRect().x
+    applyAnimation(target, 2000, false)
+    return
+  }
   const childs = gameAreaRef.current?.childNodes as NodeListOf<HTMLElement>
   const targetRect = childs[numberOfrequiredAnimation].getBoundingClientRect().x
   
@@ -130,7 +136,7 @@ function startMoving(){
     targetNodePostions.push({ele:i, x:child.getBoundingClientRect().x})
   })
   const emojiDOMRECT = emojiRef.current?.getBoundingClientRect() as  DOMRect
-  const destination = childs[program.length - 1].getBoundingClientRect()
+  const destination = childs[program.length - 1].getBoundingClientRect() || childs[4].getBoundingClientRect()
   const targetPlace = childs[childs.length  - 2].getBoundingClientRect().x
   const diffrence = destination.x - emojiDOMRECT.x
   if((targetRect - emojiDOMRECT.x) == diffrence){
@@ -144,6 +150,7 @@ function startMoving(){
 
 function applyAnimation(diffrence:number, duration:number, isLast:boolean){
   emojiRef.current?.animate([{transform: `translateX(${0})`}, {transform: `translateX(${diffrence}px)`}],{duration, fill:'forwards'})
+  const childs = gameAreaRef.current?.childNodes as NodeListOf<HTMLElement>
   emojiRef.current?.getAnimations().forEach(animation => {
     let idx = 0
    const interval1 = setInterval(() => {
@@ -152,11 +159,27 @@ function applyAnimation(diffrence:number, duration:number, isLast:boolean){
     }
     ++idx 
    if(imageRef.current === null) return
-   
    imageRef.current.src = images[idx]
+   const ongoingEmojiPosition = emojiRef.current?.getBoundingClientRect().x as number
+    const starttingPositonToAddBorder:number[] = []
+     childs.forEach(child => {
+      starttingPositonToAddBorder.push(child.getBoundingClientRect().x as number)
+    })
+    starttingPositonToAddBorder.forEach((position, i, arr) => {
+      const prvPosition  = arr[i - 1] ?? 0
+      if(ongoingEmojiPosition > prvPosition && ongoingEmojiPosition < position && blockesRef.current[i].style) {
+      blockesRef.current[i].style.border = '2px solid #fff'
+      }
+      else{
+        blockesRef.current[i].style.border = 'none'
+      }
+    })
     }, 100)
     animation.finished.then(() =>{
       clearInterval(interval1)
+      if(blockesRef.current){
+        blockesRef.current[blockesRef.current.length - 1].style.border = 'none'
+      }
       if(isLast){
         setTimeout(() => {
           if(gumRef.current)

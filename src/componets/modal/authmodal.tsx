@@ -1,3 +1,4 @@
+import { toast } from 'react-toastify';
 import { userContext } from '../../App'
 import { useContext, useRef, useState} from 'react'
 
@@ -9,6 +10,7 @@ onClose:() => void;
     const emailRef = useRef<HTMLInputElement>(null)
     const [isLoading, setIsLoading] = useState<boolean | string>('initial')
     const [success, setSuccess] = useState<boolean>(false)
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
     if (!isOpen) return null;
      const closeModal = () => {
     onClose()
@@ -18,7 +20,23 @@ async function authenticateUser() {
   setIsLoading(true)
   const { value } = emailRef.current as HTMLInputElement
   if(!value) return
-  const response = await fetch('http://localhost:3000/login', {
+  const isValidEmail = checkEmail(value)
+  console.log(isValidEmail)
+  if(!isValidEmail){
+     setIsLoading('initial')
+     toast.error('Please Enter Valid Email Address', {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      });
+    return
+  }
+  const response = await fetch('https://auth-server.kumnegerwondimu.repl.co/login', {
     method:'POST', 
     headers:{
       'Content-Type':'application/json',
@@ -30,7 +48,13 @@ async function authenticateUser() {
   })
   setIsLoading(false)
   const data =  await response.json()
-  console.log(data)
+  
+
+  if(data.message == 'User not found'){
+    setErrorMessage('no user found with email address')
+    setSuccess(false)
+    return
+  }
   
   if(data?.message == 'Email sent'){
       setSuccess(true)
@@ -40,11 +64,33 @@ async function authenticateUser() {
 } 
 
 
+function checkEmail(email: string){
+  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+}
+
+
+
 async function newUser(){
 setIsLoading(true)
 const { value } = emailRef.current as HTMLInputElement
 if(!value) return
-const response = await fetch('http://localhost:3000/register', {
+const isValidEmail = checkEmail(value)
+if(!isValidEmail){
+  setIsLoading('initial')
+  toast.error('Please Enter Valid Email Address', {
+    position: "top-center",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+    });
+    return
+}
+const response = await fetch('https://auth-server.kumnegerwondimu.repl.co/register', {
   method:'POST', 
   headers:{
     'Content-Type':'application/json',
@@ -62,6 +108,8 @@ if(data.message == 'Email sent'){
     setSuccess(true)
     return
 }
+console.log(data)
+setErrorMessage('there was an error occurred while sending email please sign in as guest until we fix the error')
 setSuccess(false)
 }
 
@@ -83,7 +131,7 @@ setSuccess(false)
                 <button onClick={authenticateUser} className="m-3 bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700">sing in</button>
                 <button onClick={newUser} className="m-3 bg-green-500 text-white font-semibold py-2 px-4 rounded hover:bg-green-700">sing up</button>
             </div>
-</> : isLoading ? <>please wait</> : success ? <>verifiaction email sent to you email addres check your inbox or spam folder</> : <>we are unble to sent verifiaction email</>} </>
+                    </> : isLoading ? <>please wait</> : success ? <>verifiaction email sent to your email addres check your email</> : <>{errorMessage}</>} </>
             <div className="w-full flex flex-col items-center">
                 <hr className="w-4/5 mx-auto border border-black"/>
                 <div>or</div>

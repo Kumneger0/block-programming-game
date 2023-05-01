@@ -1,6 +1,7 @@
 import styles from './auth.module.css'
 import {useState} from 'react'
 import { ModalPart } from '../modal/authmodal'
+import { ToastContainer } from 'react-toastify'
 
 export default function Auth() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -22,6 +23,19 @@ const onClose  = () =>  {
       </div>
     </div>
     </div>
-   } </>
+   } 
+     <ToastContainer
+position="top-center"
+autoClose={5000}
+hideProgressBar={false}
+newestOnTop={false}
+closeOnClick
+rtl={false}
+pauseOnFocusLoss
+draggable
+pauseOnHover
+theme="light"
+/>
+   </>
   )
 }

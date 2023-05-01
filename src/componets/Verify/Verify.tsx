@@ -23,10 +23,9 @@ export default function Verify({user, setUser}:{user:IUser | null, setUser:(user
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
  async function verifyUser(token:string, id:string) {
-    const url = new URL('http://localhost:3000/verify',)
+    const url = new URL('https://auth-server.kumnegerwondimu.repl.co/verify',)
     url.searchParams.append('token', token)
     url.searchParams.append('id', id)
-    console.log(url.href)
     const response =  await fetch(url)
     const data = await response.json()
     if(data.status == 200){

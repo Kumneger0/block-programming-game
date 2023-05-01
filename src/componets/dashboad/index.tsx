@@ -1,6 +1,6 @@
 import styles from './dashboard.module.css';
 import { useState, createContext } from 'react';
-import Walk from '../candyQuest/walk';
+import Walk from '../candyQuest/walk/walk';
 import { ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import dashboardImage from '../../assets/image/Z.webp'

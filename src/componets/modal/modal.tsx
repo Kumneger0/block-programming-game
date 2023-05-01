@@ -2,7 +2,7 @@ import  { useContext} from 'react';
 import type { ILevel } from '../dashboad';
 import { flushSync } from 'react-dom';
 import { levelcontext } from '../dashboad';
-import type { GameStatus } from '../candyQuest/walk';
+import type { GameStatus } from '../candyQuest/walk/walk';
 
 export const ModalPart = ({ isOpen, onClose, gameStatus, shouldDisplayNext }:{
 isOpen: boolean

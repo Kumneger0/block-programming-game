@@ -280,7 +280,6 @@ function handleTouchMove(event:Event, _options:{passive:false}){
   const element = document.elementFromPoint(touch.clientX, touch.clientY);
   if(dropZone === element){
     if(dropZone)
-    dropZone.style.background = 'green';
     shouldDropRef.current = true;
   }else{
     shouldDropRef.current = false;
@@ -301,13 +300,9 @@ else{
 
 }
 
-  type NewType = {
-    passive: boolean;
-  };
+ 
 
-  type NewType_1 = NewType;
-
-function handleTouchStart (event:Event, _options: NewType_1): void{
+function handleTouchStart (event:Event, _options:{passive:false}){
   event.preventDefault();
   const e = event as TouchEvent
   const target = e.target as HTMLElement
