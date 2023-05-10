@@ -1,0 +1,50 @@
+{
+  "name": "candy-quest",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "serve": "vite --host",
+    "build": "tsc && vite build",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "compress-images": "gulp compress-images"
+  },
+  "dependencies": {
+    "blockly": "^9.3.3",
+    "react": "^18.2.0",
+    "react-blockly": "^7.2.2",
+    "react-dom": "^18.2.0",
+    "react-helmet": "^6.1.0",
+    "react-icons": "^4.8.0",
+    "react-router-dom": "^6.10.0",
+    "react-toastify": "^9.1.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.28",
+    "@types/react-dom": "^18.0.11",
+    "@types/react-helmet": "^6.1.6",
+    "@typescript-eslint/eslint-plugin": "^5.57.1",
+    "@typescript-eslint/parser": "^5.57.1",
+    "@vitejs/plugin-react": "^4.0.0-beta.0",
+    "autoprefixer": "^10.4.14",
+    "eslint": "^8.38.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.3.4",
+    "gulp": "^4.0.2",
+    "gulp-ext-replace": "^0.3.0",
+    "gulp-imagemin": "^8.0.0",
+    "imagemin-gifsicle": "^7.0.0",
+    "imagemin-mozjpeg": "^10.0.0",
+    "imagemin-optipng": "^8.0.0",
+    "imagemin-svgo": "^10.0.1",
+    "imagemin-webp": "^8.0.0",
+    "postcss": "^8.4.23",
+    "rollup-plugin-terser": "^7.0.2",
+    "tailwindcss": "^3.3.1",
+    "type-fest": "^3.8.0",
+    "typescript": "^5.0.2",
+    "vite": "^4.3.0"
+  }
+}
