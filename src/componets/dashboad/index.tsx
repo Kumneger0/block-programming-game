@@ -1,6 +1,7 @@
 import styles from "./dashboard.module.css";
 import { useState, createContext } from "react";
 import Walk from "../candyQuest/walk/walk";
+import Conditional from "../candyQuest/conditional/Conditional";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import dashboardImage from "../../assets/image/Z.webp";
@@ -14,6 +15,8 @@ import Loading from "../../Loading/loading";
 export interface ILevel {
   level: number | null;
   setLevel: (value: number | ((prv: number) => number)) => void;
+  setJumpOrWalk : (value:"JUMP" | "WALK") => void;
+  jumpOrWalk:"JUMP" | "WALK" | null
 }
 export const levelcontext = createContext<Partial<ILevel>>({ level: null });
 
@@ -41,14 +44,8 @@ export default function Dashboard() {
         isLoading ? (
           <Loading />
         ) : (
-          <levelcontext.Provider value={{ level, setLevel }}>
-            {level === 3 ? (
-              <Walk />
-            ) : jumpOrWalk === "WALK" ? (
-              <Walk />
-            ) : (
-              <Jump />
-            )}
+          <levelcontext.Provider value={{ level, setLevel, setJumpOrWalk, jumpOrWalk }}>
+            {jumpOrWalk == "JUMP" ? <>{level == 1 ? <Jump /> : <Conditional />}</> : <><Walk /></>}
             <ToastContainer
               position="top-center"
               autoClose={5000}
@@ -116,7 +113,7 @@ export default function Dashboard() {
                 Lesson 1
               </button>
               <button
-                onClick={() => playGame(2, "JUMP")}
+                onClick={() => playGame(1, "JUMP")}
                 className="bg-yellow-200 p-1 sm:w-full  w-1/2 border-2 border-green-500 hover:bg-yellow-400"
               >
                 Lesson 2

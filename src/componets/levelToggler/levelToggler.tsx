@@ -2,14 +2,19 @@ import { toast } from 'react-toastify';
 import { levelcontext } from '../dashboad';
 import { useContext } from 'react';
 import { flushSync } from 'react-dom';
-function LevelToggler() {
-  const { level, setLevel } = useContext(levelcontext);
+function LevelToggler({jumpOrWalk}:{
+  jumpOrWalk: "JUMP" | "WALK"
+}) {
+  const { level, setLevel, setJumpOrWalk } = useContext(levelcontext);
   return (
     <div className="w-1/3 flex gap-4 justify-start">
       <div>
         <button
           onClick={() => {
-            flushSync(() => setLevel && setLevel(0))
+            flushSync(() =>{  
+              setLevel && setLevel(0)
+              setJumpOrWalk && setJumpOrWalk(jumpOrWalk)
+            })
             setLevel && setLevel(() => 1)
           }}
           className={`rounded-full ${
@@ -39,7 +44,10 @@ function LevelToggler() {
               return;
             }
 
-            flushSync(() => setLevel && setLevel(0));
+            flushSync(() =>{  
+              setLevel && setLevel(0)
+              setJumpOrWalk && setJumpOrWalk(jumpOrWalk)
+            })
             setLevel && setLevel(() => 2);
           }}
           className={`rounded-full ${
@@ -49,7 +57,7 @@ function LevelToggler() {
           2
         </button>
       </div>
-      <div>
+      <div>{jumpOrWalk == "WALK" && 
         <button
           onClick={() => {
             const levelStatus = JSON.parse(
@@ -68,8 +76,11 @@ function LevelToggler() {
               });
               return;
             }
-            flushSync(() => setLevel && setLevel(0))
-  setLevel && setLevel(() => 3)
+            flushSync(() =>{  
+              setLevel && setLevel(0)
+              setJumpOrWalk && setJumpOrWalk(jumpOrWalk)
+            })
+             setLevel && setLevel(() => 3)
           }}
           className={`rounded-full ${
             level == 3 ? 'bg-slate-700 text-white' : 'bg-white'
@@ -77,7 +88,7 @@ function LevelToggler() {
         >
           3
         </button>
-      </div>
+}</div>
     </div>
   );
 }

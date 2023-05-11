@@ -76,8 +76,10 @@ export const toolboxWithReaptBlock = {
 
 
 
-  /* 
-  {
+  export const toolboxForConditional = {
+    "kind": "flyoutToolbox",
+    "contents": [
+      {
         "kind": "block",
         "type": "controls_repeat_ext",
         "inputs":{
@@ -85,12 +87,40 @@ export const toolboxWithReaptBlock = {
             'shadow': {
               'type': 'math_number',
               'fields': {
-                'NUM': 4
+                'NUM': 7
               }
             }
           }
         }
       },
-
-  */
-
+      {"kind":"block",  type:"controls_ifelse", 
+      'args0': [
+        {
+          'type': 'input_value',
+          'name': 'IF0',
+          'check': 'Boolean',
+        },
+      ],
+      'message1': '%{BKY_CONTROLS_IF_MSG_THEN} %1',
+      'args1': [
+        {
+          'type': '1',
+          'name': 'DO0',
+        },
+      ],
+    },
+      {'kind':'block', 'type':'walk'},
+      {'kind':'block', 'type':'text', 
+      "fields": {
+        "TEXT": "Item"
+      }},
+      {'kind':'block', 'type':'text', 
+      "fields": {
+        "TEXT": "Obstackle"
+      }},
+      {'kind':'block', 'type':'logic_compare'},
+      {'kind':'block', 'type':'jump'},
+      
+    ],
+  };
+  

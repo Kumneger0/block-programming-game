@@ -201,7 +201,7 @@ function Walk() {
         className="w-screen playArea h-screen  overflow-x-hidden"
       >
         <div className="absolute top-3 right-16">
-          <LevelToggler />
+          <LevelToggler jumpOrWalk="WALK" />
         </div>
         {gameStatus.text && (
           <ModalPart
