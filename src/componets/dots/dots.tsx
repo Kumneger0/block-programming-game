@@ -21,7 +21,6 @@ export default function DotsComponent({
         >
           <img className="w-full" src={shadow} alt="" />
           {i == 1 && showObstacle && <img className="w-full -mt-4 ml-7 sm:w-28 sm:-mt-8" src={obstackle} alt="" /> }
-          {i == 4 && showObstacle && <img className="w-full -mt-4 ml-7 sm:w-28 sm:-mt-8" src={obstackle} alt="" /> }
         </div>
       ))}
     </>

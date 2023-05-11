@@ -209,7 +209,7 @@ function Jump() {
         }
       }
     });
-    indexs.forEach((number, i) => {
+    indexs.forEach((number) => {
       const element = childs[number] || null;
       if (element) {
         const position = element.getBoundingClientRect().x - emojiPosition;

@@ -47,7 +47,7 @@ async function authenticateUser() {
   })
   setIsLoading(false)
   const data =  await response.json()
-  console.log(data)
+  (data)
   if(data.message == 'User not found'){
     setIsLoading('initial')
     toast.error('No User Found With this Email Address', {
@@ -109,13 +109,13 @@ const response = await fetch('https://auth-server.kumnegerwondimu.repl.co/regist
 })
 setIsLoading(false)
 const data =  await response.json()
-console.log(data)
+(data)
 
 if(data.message == 'Email sent'){
     setSuccess(true)
     return
 }
-console.log(data)
+(data)
 setErrorMessage('there was an error occurred while sending email please sign in as guest until we fix the error')
 setSuccess(false)
 }

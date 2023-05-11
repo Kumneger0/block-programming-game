@@ -9,7 +9,7 @@ import LevelToggler from '../../levelToggler/levelToggler';
 import emoji from '../../../assets/image/initial.webp';
 import shadow from '../../../assets/image/535805e584aafa4e55000016.webp';
 import { useRef, useState, useEffect } from 'react';
-import { ModalPart } from '../../modal/modal';
+import { ModalPart} from '../../modal/modal';
 import { AiOutlinePlayCircle } from 'react-icons/ai';
 import { toast } from 'react-toastify';
 export type GameStatus = { text: string | null; type: 'fail' | 'seccuss' };
@@ -38,6 +38,7 @@ function Conditional() {
   const [Dots, setDots] = useState<number[]>([]);
   const closeModal = () => setIsOpen(false);
   const workspaceRef = useRef<Blockly.Workspace | null>(null);
+  const [walkIndex, setWalkIndex] = useState<number[] | null>(null)
   const [indexs, setIndexes] = useState<number[]>([]);
   const [isUpdated, setIsUpdated] = useState<boolean | null>(null);
   const [Images, setImages] = useState<string[]>([]);
@@ -116,18 +117,17 @@ function Conditional() {
     // eslint-disable-next-line prefer-const,
     let counter = 0;
     const jumpIndex: number[] = [];
-    const strToExcute = `(() => {
-    ${code}
-  })();`;
+    const walkIndex: number[] = [];
     setTimeout(() => {
       setIndexes(jumpIndex);
+      setWalkIndex(walkIndex)
       setIsUpdated((prv) => {
         if(prv == null) return true
         if(prv == true) return false
         return true
       });
     }, 100);
-    eval(strToExcute);
+    eval(code);
     setCounter(counter)
   }
 
@@ -166,6 +166,7 @@ function Conditional() {
           }
         },
       );
+    console.log("keyframes: " , keyFrames)
     emojiRef?.animate(keyFrames, {
       duration: 5000,
       fill: 'forwards',
@@ -209,16 +210,14 @@ function changeImages(isCorrect:boolean){
 }
 
 
-
-
-
   useEffect(() => {
-    setDots([1, 2, 3, 4, 5, 6, 7]);
+    setDots([1, 2, 3, 4, 5]);
   }, []);
 
   useEffect(() => {
     if(isUpdated === null) return
     generateKeyFrames(indexs);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isUpdated]);
 
   function generateKeyFrames(indexs: number[]) {
@@ -237,23 +236,22 @@ function changeImages(isCorrect:boolean){
   
     const totalItem = workspaceRef.current?.getAllBlocks(false);
     if (!totalItem?.length) return;
-    totalItem?.forEach((item, i) => {
-      if (item.type == 'walk') {
-        const element = childs[i + 1] || null;
+    walkIndex?.forEach((index) => {
+        const element = childs[index - 1] || null;
         if (element) {
           const position = element.getBoundingClientRect().x - emojiPosition;
+          if(position <= 0) return
           postionForWalk.push({ x: position, isJump: false });
         }
-      }
     });
-    indexs.forEach((number, i) => {
-      const element = childs[number] || null;
+    indexs.forEach((number) => {
+      const element = childs[number - 1] || null;
       if (element) {
         const position = element.getBoundingClientRect().x - emojiPosition;
         forJump.push({ x: position, isJump: true });
       }
     });
-    const isCorrect = indexs.length == 2 && indexs[0] == 3 && indexs[1] == 6;
+    const isCorrect = indexs.length == 1 && indexs[0] == 3;
     const sorted = [...forJump, ...postionForWalk].sort((a, b) => a.x - b.x);
     applyAnimation(sorted, isCorrect);
   }
