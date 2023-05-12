@@ -67,7 +67,18 @@ function Walk() {
     if (!workspaceRef.current) return;
     //@ts-expect-error b/c i can't find other ways
     const size = workspaceRef.current.blockDB.size;
-    if (size == 0) return;
+    if (size == 0) {
+      toast.error('Connect Blocks To Play ', {
+        position: 'top-center',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
+      return}
     const isConnected = areAllBlocksConnected(workspaceRef);
     if (!isConnected) {
       toast.error('All Blocks Must be Connected Together ', {
@@ -142,6 +153,9 @@ function Walk() {
           clearInterval(interval1);
           if (isCorrect) {
             setGameStatus({ text: 'Correct!', type: 'seccuss' });
+            const levelFromLocalStorage = JSON.parse(localStorage.getItem("level-status") as string) || {completed:[]}
+            levelFromLocalStorage.completed.push(level)
+            localStorage.setItem("level-status", JSON.stringify(levelFromLocalStorage))
           } else {
             setGameStatus({ text: 'Wrong!', type: 'fail' });
           }

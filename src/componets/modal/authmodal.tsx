@@ -35,7 +35,7 @@ async function authenticateUser() {
       });
     return
   }
-  const response = await fetch('https://auth-server.kumnegerwondimu.repl.co/login', {
+  const response = await fetch('http://localhost:3000/login', {
     method:'POST', 
     headers:{
       'Content-Type':'application/json',
@@ -46,8 +46,8 @@ async function authenticateUser() {
     })
   })
   setIsLoading(false)
-  const data =  await response.json()
-  (data)
+  const data =  await response.json();
+  if(data)
   if(data.message == 'User not found'){
     setIsLoading('initial')
     toast.error('No User Found With this Email Address', {
@@ -97,7 +97,7 @@ if(!isValidEmail){
     });
     return
 }
-const response = await fetch('https://auth-server.kumnegerwondimu.repl.co/register', {
+const response = await fetch('http://localhost:3000/register', {
   method:'POST', 
   headers:{
     'Content-Type':'application/json',
@@ -108,9 +108,8 @@ const response = await fetch('https://auth-server.kumnegerwondimu.repl.co/regist
   })
 })
 setIsLoading(false)
-const data =  await response.json()
-(data)
-
+const data =  await response.json();
+if(data)
 if(data.message == 'Email sent'){
     setSuccess(true)
     return

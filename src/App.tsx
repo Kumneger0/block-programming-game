@@ -23,7 +23,7 @@ function App(): JSX.Element {
    const token = localStorage.getItem('token')
    if (token) {
     (async() => {
-    const url = new URL('https://auth-server.kumnegerwondimu.repl.co/verifyToken')
+    const url = new URL('http://localhost:3000/verifyToken')
     url.searchParams.append('token', token)
      const response = await fetch(url.href)
      const data = await response.json()
