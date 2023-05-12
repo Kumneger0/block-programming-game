@@ -166,7 +166,7 @@ function Conditional() {
           }
         },
       );
-    console.log("keyframes: " , keyFrames)
+    if(keyFrames.length <= 1) return
     emojiRef?.animate(keyFrames, {
       duration: 5000,
       fill: 'forwards',
@@ -209,7 +209,6 @@ function changeImages(isCorrect:boolean){
   }
 }
 
-
   useEffect(() => {
     setDots([1, 2, 3, 4, 5]);
   }, []);
@@ -251,8 +250,8 @@ function changeImages(isCorrect:boolean){
         forJump.push({ x: position, isJump: true });
       }
     });
-    const isCorrect = indexs.length == 1 && indexs[0] == 3;
     const sorted = [...forJump, ...postionForWalk].sort((a, b) => a.x - b.x);
+    const isCorrect = indexs.length == 1 && indexs[0] == 3 && sorted.length == 5;
     applyAnimation(sorted, isCorrect);
   }
 
