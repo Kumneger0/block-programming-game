@@ -2,6 +2,7 @@ import * as Blockly from 'blockly';
 import GameArea from '../../gameArea/gameArea';
 import { javascriptGenerator } from 'blockly/javascript';
 import { Helmet } from 'react-helmet';
+import { areAllBlocksConnected, generateKeyFrames } from '../../../utils';
 import { toolboxForConditional } from '../../toolbox/toolbox';
 import gum from '../../../assets/image/54650f8684aafa0d7d00004c.webp';
 import { Workspace2 } from '../../workspace/Workspace';
@@ -62,25 +63,7 @@ function Conditional() {
     }
   }, []);
 
-  function areAllBlocksConnected() {
-    if (!workspaceRef.current) return;
-    const blocks = workspaceRef.current.getAllBlocks(false);
-
-    let isConnected = true;
-    const size = blocks.length;
-    if (size == 1) return true;
-    blocks.forEach((block, i) => {
-      if (i == 0 || !isConnected) return;
-      const parent = block.getParent();
-      if (!parent) {
-        isConnected = false;
-        return;
-      }
-      isConnected = true;
-    });
-    return isConnected;
-  }
-
+  
   function startMoving() {
     if (!workspaceRef.current) return;
     //@ts-expect-error b/c i can't find other ways
@@ -98,7 +81,7 @@ function Conditional() {
       });
       return;
     }
-    const isConnected = areAllBlocksConnected();
+    const isConnected =  areAllBlocksConnected(workspaceRef);
     if (!isConnected) {
       toast.error('Blocks Must be Connected Together ', {
         position: 'top-center',
@@ -215,45 +198,17 @@ function changeImages(isCorrect:boolean){
 
   useEffect(() => {
     if(isUpdated === null) return
-    generateKeyFrames(indexs);
+    const paramsToGenKeyFrames = {indexs, gameAreaChildRefs, walkIndex, counter}
+    const resObect = generateKeyFrames(paramsToGenKeyFrames)
+    console.log(resObect)
+    if(resObect.position){
+      applyAnimation(null, false, resObect.position)
+    }
+    if(resObect.sorted){
+      applyAnimation(resObect.sorted, resObect.isCorrect)
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isUpdated]);
-
-  function generateKeyFrames(indexs: number[]) {
-    const { gameArea, emojiRef } = gameAreaChildRefs.current as IRefs;
-    const childs = gameArea?.childNodes as NodeListOf<HTMLElement>;
-    const emojiPosition = emojiRef?.getBoundingClientRect().x as number;
-    if (!indexs.length) {
-     const destinationX  =  childs[counter - 1]?.getBoundingClientRect().x - emojiPosition
-     applyAnimation(null, null, destinationX)
-     return
-    }
-    const postionForWalk: { x: number; isJump: boolean }[] = [];
-  
-   
-    const forJump: { x: number; isJump: boolean }[] = [];
-  
-    const totalItem = workspaceRef.current?.getAllBlocks(false);
-    if (!totalItem?.length) return;
-    walkIndex?.forEach((index) => {
-        const element = childs[index] || null;
-        if (element) {
-          const position = element.getBoundingClientRect().x - emojiPosition;
-          if(position <= 0) return
-          postionForWalk.push({ x: position, isJump: false });
-        }
-    });
-    indexs.forEach((number) => {
-      const element = childs[number] || null;
-      if (element) {
-        const position = element.getBoundingClientRect().x - emojiPosition;
-        forJump.push({ x: position, isJump: true });
-      }
-    });
-    const sorted = [...forJump, ...postionForWalk].sort((a, b) => a.x - b.x);
-    const isCorrect = indexs.length == 1 && indexs[0] == 3 && sorted.length == 5;
-    applyAnimation(sorted, isCorrect);
-  }
 
   const workspaceToCode = (workspace: Blockly.Workspace) => {
     if (workspace) {

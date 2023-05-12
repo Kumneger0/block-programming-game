@@ -15,7 +15,8 @@ export const ModalPart = ({
   gameStatus: GameStatus;
   shouldDisplayNext?: boolean;
 }) => {
-  const { level, setLevel } = useContext<Partial<ILevel>>(levelcontext);
+  const { level, setLevel, setJumpOrWalk, jumpOrWalk } =
+    useContext<Partial<ILevel>>(levelcontext);
   const closeAndReplay = () => {
     flushSync(() => setLevel && setLevel(0));
     setLevel && setLevel(() => level as number);
@@ -23,14 +24,16 @@ export const ModalPart = ({
   };
 
   const loadNextLesson = () => {
-    flushSync(
-      () =>
-        setLevel &&
-        setLevel((prv) => {
-          return prv - 1;
-        }),
-    );
-    setLevel && setLevel((prv: number) => prv + 2);
+    const currentState = jumpOrWalk as 'JUMP' | 'WALK';
+    const currentLevel = level as number;
+    if (setJumpOrWalk)
+      flushSync(() => {
+        setJumpOrWalk &&
+          setJumpOrWalk(currentState === 'JUMP' ? 'WALK' : 'JUMP');
+      });
+    setJumpOrWalk && setJumpOrWalk(currentState);
+    flushSync(() => setLevel && setLevel(0));
+    setLevel && setLevel(() => currentLevel + 1);
     onClose();
   };
 

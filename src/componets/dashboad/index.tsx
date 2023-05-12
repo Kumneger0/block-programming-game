@@ -15,7 +15,7 @@ import Loading from "../../Loading/loading";
 export interface ILevel {
   level: number | null;
   setLevel: (value: number | ((prv: number) => number)) => void;
-  setJumpOrWalk : (value:"JUMP" | "WALK") => void;
+  setJumpOrWalk : (prv:"JUMP" | "WALK"|((prv:"JUMP" | "WALK" | null) => "JUMP" | "WALK")) => void;
   jumpOrWalk:"JUMP" | "WALK" | null
 }
 export const levelcontext = createContext<Partial<ILevel>>({ level: null });

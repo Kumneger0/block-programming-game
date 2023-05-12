@@ -1,6 +1,7 @@
 import "./walk.css";
 import * as Blockly from "blockly";
 import GameArea from "../../gameArea/gameArea";
+import { areAllBlocksConnected, clearWorkspace } from "../../../utils";
 import { javascriptGenerator } from "blockly/javascript";
 import LevelToggler from "../../levelToggler/levelToggler";
 import { Helmet } from "react-helmet";
@@ -65,31 +66,12 @@ function Walk() {
     }
   }, []);
 
-  function areAllBlocksConnected() {
-    if(!workspaceRef.current) return
-    const blocks = workspaceRef.current.getAllBlocks(false)
- 
-    let isConnected = true;
-    const size = blocks.length 
-    if(size  == 1) return true
-    blocks.forEach((block, i) => {
-      if (i == 0 || !isConnected) return
-      const parent = block.getParent()
-      if(!parent){
-        isConnected = false
-        return
-      }
-      isConnected = true
-    })
-    return isConnected;
-  }
-
   function startMoving() {
     if (!workspaceRef.current) return;
     //@ts-expect-error b/c i can't find other ways
     const size = workspaceRef.current.blockDB.size;
     if (size == 0) return;
-    const isConnected = areAllBlocksConnected()
+    const isConnected = areAllBlocksConnected(workspaceRef)
     if(!isConnected){
       toast.error("All Blocks Must be Connected Together ", {
         position: "top-center",
@@ -106,6 +88,7 @@ function Walk() {
     const code = javascriptGenerator.workspaceToCode(workspaceRef.current);
     // eslint-disable-next-line prefer-const
     let counter = 0;
+    const walkIndex:number[] = [];
     const strToExcute = `(() => {
     ${code}
   })();`;
@@ -177,6 +160,10 @@ function Walk() {
     }
     if (level == 2 || level == 3) {
       setDots([1, 2, 3, 4]);
+      const blocks = workspaceRef.current?.getAllBlocks(false)
+      if(blocks?.length){
+        clearWorkspace(workspaceRef)
+      }
     }
   }, [level]);
 

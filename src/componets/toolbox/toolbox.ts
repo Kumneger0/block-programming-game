@@ -35,7 +35,7 @@ Blockly.common.defineBlocksWithJsonArray([
 javascriptGenerator['walk'] = function (_block: unknown) {
   const code = `(() => {
      counter++
-     walkIndex.push(counter)
+      walkIndex.push(counter)
     })();`;
   return code;
 };

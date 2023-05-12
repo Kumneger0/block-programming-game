@@ -113,6 +113,8 @@ function Jump() {
     }
     const code = javascriptGenerator.workspaceToCode(workspaceRef.current);
     // eslint-disable-next-line prefer-const, 
+    const walkIndex:number[] = []
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let counter = 0;
     const jumpIndex: number[] = [];
     const strToExcute = `(() => {
@@ -138,8 +140,8 @@ function Jump() {
         if (isJump) {
           const prv = arr[i - 1]?.x ?? 0;
           const transform = { transform: `translate(${i == 0 ? prv : prv - 50}px, -50px)` };
-          const transform2 = { transform: `translate(${prv + 50}px, -50px)` };
-          const transform3 = { transform: `translate(${prv + 50}px, 0)` };
+          const transform2 = { transform: `translate(${prv + 20}px, -50px)` };
+          const transform3 = { transform: `translate(${prv + 20}px, 0)` };
           keyFrames.push(transform, transform2, transform3);
         }
         if (!isJump) {
