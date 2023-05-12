@@ -74,7 +74,7 @@ export function generateKeyFrames({
 
 export const clearWorkspace = (workspaceRef: MutableRefObject<Blockly.Workspace | null>) => {
   const blocks = workspaceRef.current?.getAllBlocks(false)
-  console.log(blocks)
+  if(!blocks?.length) return
   blocks?.forEach(block => {
     block.dispose(true)
   })

@@ -1,22 +1,22 @@
-import "./walk.css";
-import * as Blockly from "blockly";
-import GameArea from "../../gameArea/gameArea";
-import { areAllBlocksConnected, clearWorkspace } from "../../../utils";
-import { javascriptGenerator } from "blockly/javascript";
-import LevelToggler from "../../levelToggler/levelToggler";
-import { Helmet } from "react-helmet";
-import gum from "../../../assets/image/54650f8684aafa0d7d00004c.webp";
-import { Workspace2 } from "../../workspace/Workspace";
-import { toolbox, toolboxWithReaptBlock } from "../../toolbox/toolbox";
-import emoji from "../../../assets/image/initial.webp";
-import shadow from "../../../assets/image/535805e584aafa4e55000016.webp";
-import { useRef, useState, useContext, useEffect } from "react";
-import { levelcontext } from "../../dashboad";
-import { ModalPart } from "../../modal/modal";
-import { AiOutlinePlayCircle } from "react-icons/ai";
-import { toast } from "react-toastify";
-export type GameStatus = { text: string | null; type: "fail" | "seccuss" };
-const allimages = import.meta.glob("../../../assets/image/images/walking/*");
+import './walk.css';
+import * as Blockly from 'blockly';
+import GameArea from '../../gameArea/gameArea';
+import { areAllBlocksConnected, clearWorkspace } from '../../../utils';
+import { javascriptGenerator } from 'blockly/javascript';
+import LevelToggler from '../../levelToggler/levelToggler';
+import { Helmet } from 'react-helmet';
+import gum from '../../../assets/image/54650f8684aafa0d7d00004c.webp';
+import { Workspace2 } from '../../workspace/Workspace';
+import { toolbox, toolboxWithReaptBlock } from '../../toolbox/toolbox';
+import emoji from '../../../assets/image/initial.webp';
+import shadow from '../../../assets/image/535805e584aafa4e55000016.webp';
+import { useRef, useState, useContext, useEffect } from 'react';
+import { levelcontext } from '../../dashboad';
+import { ModalPart } from '../../modal/modal';
+import { AiOutlinePlayCircle } from 'react-icons/ai';
+import { toast } from 'react-toastify';
+export type GameStatus = { text: string | null; type: 'fail' | 'seccuss' };
+const allimages = import.meta.glob('../../../assets/image/images/walking/*');
 const images: string[] = [];
 Object.keys(allimages).forEach((key) => {
   allimages[key]().then((res) => {
@@ -29,15 +29,12 @@ function returnImages() {
   return images;
 }
 
-
-export interface IRefs{
-  gameArea:HTMLDivElement | null, 
-  emojiRef:HTMLDivElement | null, 
-  imageRef:HTMLImageElement | null,
-  gumRef:HTMLButtonElement | null
+export interface IRefs {
+  gameArea: HTMLDivElement | null;
+  emojiRef: HTMLDivElement | null;
+  imageRef: HTMLImageElement | null;
+  gumRef: HTMLButtonElement | null;
 }
-
-
 
 function Walk() {
   const { level } = useContext(levelcontext);
@@ -49,15 +46,15 @@ function Walk() {
   const [Images, setImages] = useState<string[]>([]);
   const [gameStatus, setGameStatus] = useState<GameStatus>({
     text: null,
-    type: "seccuss",
+    type: 'seccuss',
   });
 
-  const gameAreaChildRefs = useRef< IRefs>({
-    gameArea:null ,
-    emojiRef:null ,
-    imageRef:null,
-    gumRef:null
-  })
+  const gameAreaChildRefs = useRef<IRefs>({
+    gameArea: null,
+    emojiRef: null,
+    imageRef: null,
+    gumRef: null,
+  });
 
   useEffect(() => {
     const images = returnImages();
@@ -71,24 +68,24 @@ function Walk() {
     //@ts-expect-error b/c i can't find other ways
     const size = workspaceRef.current.blockDB.size;
     if (size == 0) return;
-    const isConnected = areAllBlocksConnected(workspaceRef)
-    if(!isConnected){
-      toast.error("All Blocks Must be Connected Together ", {
-        position: "top-center",
+    const isConnected = areAllBlocksConnected(workspaceRef);
+    if (!isConnected) {
+      toast.error('All Blocks Must be Connected Together ', {
+        position: 'top-center',
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "light",
+        theme: 'light',
       });
-      return
+      return;
     }
     const code = javascriptGenerator.workspaceToCode(workspaceRef.current);
     // eslint-disable-next-line prefer-const
     let counter = 0;
-    const walkIndex:number[] = [];
+    const walkIndex: number[] = [];
     const strToExcute = `(() => {
     ${code}
   })();`;
@@ -100,7 +97,7 @@ function Walk() {
       isCorrect = false;
     }
     let diffrence = 0;
-    const {gameArea, emojiRef} =  gameAreaChildRefs.current as IRefs
+    const { gameArea, emojiRef } = gameAreaChildRefs.current as IRefs;
     const childs = gameArea?.childNodes as NodeListOf<HTMLElement>;
     const targetPosition = childs[counter]?.getBoundingClientRect().x || 0;
     if (emojiRef) {
@@ -116,7 +113,7 @@ function Walk() {
   }
 
   function applyAnimation(diffrence: number, isCorrect: boolean) {
-    const {emojiRef, imageRef} = gameAreaChildRefs.current as IRefs
+    const { emojiRef, imageRef } = gameAreaChildRefs.current as IRefs;
     if (!diffrence) return;
     if (emojiRef) {
       emojiRef.animate(
@@ -124,7 +121,7 @@ function Walk() {
           { transform: `translateX(${0})` },
           { transform: `translateX(${diffrence}px)` },
         ],
-        { duration: 2000, fill: "forwards" }
+        { duration: 2000, fill: 'forwards' },
       );
     }
     if (emojiRef) {
@@ -144,9 +141,9 @@ function Walk() {
         animation.finished.then(() => {
           clearInterval(interval1);
           if (isCorrect) {
-            setGameStatus({ text: "Correct!", type: "seccuss" });
+            setGameStatus({ text: 'Correct!', type: 'seccuss' });
           } else {
-            setGameStatus({ text: "Wrong!", type: "fail" });
+            setGameStatus({ text: 'Wrong!', type: 'fail' });
           }
           setIsOpen(true);
         });
@@ -160,9 +157,9 @@ function Walk() {
     }
     if (level == 2 || level == 3) {
       setDots([1, 2, 3, 4]);
-      const blocks = workspaceRef.current?.getAllBlocks(false)
-      if(blocks?.length){
-        clearWorkspace(workspaceRef)
+      const blocks = workspaceRef.current?.getAllBlocks(false);
+      if (blocks?.length) {
+        clearWorkspace(workspaceRef);
       }
     }
   }, [level]);
@@ -179,14 +176,12 @@ function Walk() {
         <Helmet>
           {Images.map((img) => {
             return <link key={img} rel="preload" href={img} as="image" />;
-          })}{" "}
+          })}{' '}
         </Helmet>
       ) : (
         <></>
       )}
-      <div
-        className="w-screen playArea h-screen  overflow-x-hidden"
-      >
+      <div className="w-screen playArea h-screen  overflow-x-hidden">
         <div className="absolute top-3 right-16">
           <LevelToggler jumpOrWalk="WALK" />
         </div>
@@ -199,11 +194,23 @@ function Walk() {
           />
         )}
         <div className="max-w-5xl h-auto flex mx-auto flex-nowrap justify-end responsive">
-          <div className="md:w-full w-3/4 sm:w-full h-80 justify-self-end">
-            <Workspace2 toolbox={level == 1 || level == 2 ? toolbox : toolboxWithReaptBlock} workspaceToCode={workspaceToCode} />
+          <div className="md:w-full w-3/4 sm:w-full h-80 justify-self-end relative">
+            <Workspace2
+              toolbox={
+                level == 1 || level == 2 ? toolbox : toolboxWithReaptBlock
+              }
+              workspaceToCode={workspaceToCode}
+            />
           </div>
         </div>
-        <GameArea showObstacle = {false} ref = {gameAreaChildRefs} emoji = {emoji} gum = {gum} shadow = {shadow} Dots = {Dots}/>
+        <GameArea
+          showObstacle={false}
+          ref={gameAreaChildRefs}
+          emoji={emoji}
+          gum={gum}
+          shadow={shadow}
+          Dots={Dots}
+        />
         <div className="playBTN fixed bottom-0 right-24 w-9 p-8">
           <div
             role="button"

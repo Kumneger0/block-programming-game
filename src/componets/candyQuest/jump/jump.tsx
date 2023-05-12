@@ -255,7 +255,7 @@ function Jump() {
           />
         )}
         <div className="max-w-5xl h-auto flex mx-auto flex-nowrap justify-end responsive">
-          <div className="md:w-full w-3/4 sm:w-full h-80 justify-self-end">
+          <div className="md:w-full w-3/4 sm:w-full h-80 justify-self-end relative">
             <Workspace2
               toolbox={toolboxWithJump}
               workspaceToCode={workspaceToCode}
