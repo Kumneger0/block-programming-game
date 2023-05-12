@@ -237,7 +237,7 @@ function changeImages(isCorrect:boolean){
     const totalItem = workspaceRef.current?.getAllBlocks(false);
     if (!totalItem?.length) return;
     walkIndex?.forEach((index) => {
-        const element = childs[index - 1] || null;
+        const element = childs[index] || null;
         if (element) {
           const position = element.getBoundingClientRect().x - emojiPosition;
           if(position <= 0) return
@@ -245,7 +245,7 @@ function changeImages(isCorrect:boolean){
         }
     });
     indexs.forEach((number) => {
-      const element = childs[number - 1] || null;
+      const element = childs[number] || null;
       if (element) {
         const position = element.getBoundingClientRect().x - emojiPosition;
         forJump.push({ x: position, isJump: true });

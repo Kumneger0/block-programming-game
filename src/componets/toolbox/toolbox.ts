@@ -17,7 +17,7 @@ Blockly.common.defineBlocksWithJsonArray([
   },
   {
     type: 'counter',
-    message0: 'counter: %1',
+    message0: 'position: %1',
     args0: [
       {
         type: 'input_value',
@@ -106,7 +106,7 @@ export const toolboxForConditional = {
           shadow: {
             type: 'math_number',
             fields: {
-              NUM: 7,
+              NUM: 0,
             },
           },
         },
