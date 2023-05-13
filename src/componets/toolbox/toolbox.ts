@@ -17,7 +17,7 @@ Blockly.common.defineBlocksWithJsonArray([
   },
   {
     type: 'counter',
-    message0: 'position: %1',
+    message0: 'posOfDot %1',
     args0: [
       {
         type: 'input_value',

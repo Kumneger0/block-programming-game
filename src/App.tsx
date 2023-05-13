@@ -23,7 +23,7 @@ function App(): JSX.Element {
    const token = localStorage.getItem('token')
    if (token) {
     (async() => {
-    const url = new URL('http://localhost:3000/verifyToken')
+    const url = new URL('https://server-rtdf.onrender.com/verifyToken')
     url.searchParams.append('token', token)
      const response = await fetch(url.href)
      const data = await response.json()

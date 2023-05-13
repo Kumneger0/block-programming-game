@@ -162,7 +162,7 @@ function Conditional() {
   }
   
 function changeImages(isCorrect:boolean){
-  const { emojiRef, imageRef } = gameAreaChildRefs.current as IRefs;
+  const { emojiRef, imageRef, gumRef } = gameAreaChildRefs.current as IRefs;
   if(emojiRef){
     const animations = emojiRef.getAnimations();
     if (!animations.length) return;
@@ -181,6 +181,9 @@ function changeImages(isCorrect:boolean){
         clearInterval(interval1);
         setTimeout(() => {
           if (isCorrect) {
+            if(gumRef){
+              gumRef.style.display = "none";
+            }
             setGameStatus({ text: 'Great!', type: 'seccuss' });
           } else {
             setGameStatus({ text: 'Failed!', type: 'fail' });
@@ -200,7 +203,6 @@ function changeImages(isCorrect:boolean){
     if(isUpdated === null) return
     const paramsToGenKeyFrames = {indexs, gameAreaChildRefs, walkIndex, counter}
     const resObect = generateKeyFrames(paramsToGenKeyFrames)
-    console.log(resObect)
     if(resObect.position){
       applyAnimation(null, false, resObect.position)
     }
@@ -236,7 +238,7 @@ function changeImages(isCorrect:boolean){
             isOpen={isOpen}
             onClose={closeModal}
             gameStatus={gameStatus}
-            shouldDisplayNext={true}
+            shouldDisplayNext={false}
           />
         )}
         <div className="max-w-5xl h-auto flex mx-auto flex-nowrap justify-end responsive">

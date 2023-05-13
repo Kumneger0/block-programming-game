@@ -112,7 +112,6 @@ function Jump() {
       return;
     }
     const code = javascriptGenerator.workspaceToCode(workspaceRef.current);
-    // eslint-disable-next-line prefer-const, 
     const walkIndex:number[] = []
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, prefer-const
     let counter = 0;
@@ -175,9 +174,9 @@ function Jump() {
           clearInterval(interval1);
           setTimeout(() => {
             if (isCorrect) {
-              const levelFromLocalStorage = JSON.parse(localStorage.getItem("level-status") as string)
-              levelFromLocalStorage.completed = [...levelFromLocalStorage, 1]
-              localStorage.setItem('level-status', JSON.stringify(levelFromLocalStorage))
+              const levelFromLocalStorage = JSON.parse(localStorage.getItem('level-status-jump') as string) || {completedJUMP:[]}
+              levelFromLocalStorage.completedJUMP.push(1)
+              localStorage.setItem("level-status-jump", JSON.stringify(levelFromLocalStorage))
               setGameStatus({ text: 'Great!', type: 'seccuss' });
             } else {
               setGameStatus({ text: 'Failed!', type: 'fail' });

@@ -81,7 +81,7 @@ function Walk() {
       return}
     const isConnected = areAllBlocksConnected(workspaceRef);
     if (!isConnected) {
-      toast.error('All Blocks Must be Connected Together ', {
+      toast.error('Blocks Must be Connected Together ', {
         position: 'top-center',
         autoClose: 5000,
         hideProgressBar: false,
@@ -124,7 +124,7 @@ function Walk() {
   }
 
   function applyAnimation(diffrence: number, isCorrect: boolean) {
-    const { emojiRef, imageRef } = gameAreaChildRefs.current as IRefs;
+    const { emojiRef, imageRef,gumRef } = gameAreaChildRefs.current as IRefs;
     if (!diffrence) return;
     if (emojiRef) {
       emojiRef.animate(
@@ -152,6 +152,9 @@ function Walk() {
         animation.finished.then(() => {
           clearInterval(interval1);
           if (isCorrect) {
+            if(gumRef){
+              gumRef.style.display = "none";
+            }
             setGameStatus({ text: 'Correct!', type: 'seccuss' });
             const levelFromLocalStorage = JSON.parse(localStorage.getItem("level-status") as string) || {completed:[]}
             levelFromLocalStorage.completed.push(level)

@@ -18,7 +18,7 @@ export default function Verify({user, setUser}:{user:IUser | null, setUser:(user
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
  async function verifyUser(token:string, id:string) {
-    const url = new URL('http://localhost:3000/verify',)
+    const url = new URL('https://server-rtdf.onrender.com/verify',)
     url.searchParams.append('token', token)
     url.searchParams.append('id', id)
     const response =  await fetch(url)

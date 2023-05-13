@@ -35,7 +35,7 @@ async function authenticateUser() {
       });
     return
   }
-  const response = await fetch('http://localhost:3000/login', {
+  const response = await fetch('https://server-rtdf.onrender.com/login', {
     method:'POST', 
     headers:{
       'Content-Type':'application/json',
@@ -97,7 +97,7 @@ if(!isValidEmail){
     });
     return
 }
-const response = await fetch('http://localhost:3000/register', {
+const response = await fetch('https://server-rtdf.onrender.com/register', {
   method:'POST', 
   headers:{
     'Content-Type':'application/json',
