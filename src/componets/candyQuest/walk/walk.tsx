@@ -1,8 +1,6 @@
 import './walk.css';
-import * as Blockly from 'blockly';
+import { Workspace } from 'blockly';
 import GameArea from '../../gameArea/gameArea';
-import { areAllBlocksConnected, clearWorkspace } from '../../../utils';
-import { javascriptGenerator } from 'blockly/javascript';
 import LevelToggler from '../../levelToggler/levelToggler';
 import { Helmet } from 'react-helmet';
 import gum from '../../../assets/image/54650f8684aafa0d7d00004c.webp';
@@ -14,7 +12,6 @@ import { useRef, useState, useContext, useEffect } from 'react';
 import { levelcontext } from '../../dashboad';
 import { ModalPart } from '../../modal/modal';
 import { AiOutlinePlayCircle } from 'react-icons/ai';
-import { toast } from 'react-toastify';
 export type GameStatus = { text: string | null; type: 'fail' | 'seccuss' };
 const allimages = import.meta.glob('../../../assets/image/images/walking/*');
 const images: string[] = [];
@@ -41,7 +38,7 @@ function Walk() {
   const [isOpen, setIsOpen] = useState(false);
   const [Dots, setDots] = useState<number[]>([]);
   const closeModal = () => setIsOpen(false);
-  const workspaceRef = useRef<Blockly.Workspace | null>(null);
+  const workspaceRef = useRef<Workspace | null>(null);
 
   const [Images, setImages] = useState<string[]>([]);
   const [gameStatus, setGameStatus] = useState<GameStatus>({
@@ -63,8 +60,9 @@ function Walk() {
     }
   }, []);
 
-  function startMoving() {
+  async function startMoving() {
     if (!workspaceRef.current) return;
+    const { toast } = await import('react-toastify');
     //@ts-expect-error b/c i can't find other ways
     const size = workspaceRef.current.blockDB.size;
     if (size == 0) {
@@ -78,7 +76,9 @@ function Walk() {
         progress: undefined,
         theme: 'light',
       });
-      return}
+      return;
+    }
+    const { areAllBlocksConnected } = await import('../../../utils');
     const isConnected = areAllBlocksConnected(workspaceRef);
     if (!isConnected) {
       toast.error('Blocks Must be Connected Together ', {
@@ -93,14 +93,17 @@ function Walk() {
       });
       return;
     }
+    const { javascriptGenerator } = await import('blockly/javascript');
     const code = javascriptGenerator.workspaceToCode(workspaceRef.current);
     // eslint-disable-next-line prefer-const
     let counter = 0;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const walkIndex: number[] = [];
     const strToExcute = `(() => {
     ${code}
   })();`;
     eval(strToExcute);
+    console.log(walkIndex);
     let isCorrect: boolean;
     if (Dots.length == counter) {
       isCorrect = true;
@@ -124,7 +127,7 @@ function Walk() {
   }
 
   function applyAnimation(diffrence: number, isCorrect: boolean) {
-    const { emojiRef, imageRef,gumRef } = gameAreaChildRefs.current as IRefs;
+    const { emojiRef, imageRef, gumRef } = gameAreaChildRefs.current as IRefs;
     if (!diffrence) return;
     if (emojiRef) {
       emojiRef.animate(
@@ -152,13 +155,18 @@ function Walk() {
         animation.finished.then(() => {
           clearInterval(interval1);
           if (isCorrect) {
-            if(gumRef){
-              gumRef.style.display = "none";
+            if (gumRef) {
+              gumRef.style.display = 'none';
             }
             setGameStatus({ text: 'Correct!', type: 'seccuss' });
-            const levelFromLocalStorage = JSON.parse(localStorage.getItem("level-status") as string) || {completed:[]}
-            levelFromLocalStorage.completed.push(level)
-            localStorage.setItem("level-status", JSON.stringify(levelFromLocalStorage))
+            const levelFromLocalStorage = JSON.parse(
+              localStorage.getItem('level-status') as string,
+            ) || { completed: [] };
+            levelFromLocalStorage.completed.push(level);
+            localStorage.setItem(
+              'level-status',
+              JSON.stringify(levelFromLocalStorage),
+            );
           } else {
             setGameStatus({ text: 'Wrong!', type: 'fail' });
           }
@@ -176,12 +184,15 @@ function Walk() {
       setDots([1, 2, 3, 4]);
       const blocks = workspaceRef.current?.getAllBlocks(false);
       if (blocks?.length) {
-        clearWorkspace(workspaceRef);
+        (async () => {
+          const { clearWorkspace } = await import('../../../utils');
+          clearWorkspace(workspaceRef);
+        })();
       }
     }
   }, [level]);
 
-  const workspaceToCode = (workspace: Blockly.Workspace) => {
+  const workspaceToCode = (workspace: Workspace) => {
     if (workspace) {
       workspaceRef.current = workspace;
     }

@@ -1,7 +1,6 @@
 import './jump.css';
-import * as Blockly from 'blockly';
+import { Workspace } from 'blockly';
 import GameArea from '../../gameArea/gameArea';
-import { javascriptGenerator } from 'blockly/javascript';
 import { Helmet } from 'react-helmet';
 import LevelToggler from '../../levelToggler/levelToggler';
 import gum from '../../../assets/image/54650f8684aafa0d7d00004c.webp';
@@ -38,7 +37,7 @@ function Jump() {
   const [isOpen, setIsOpen] = useState(false);
   const [Dots, setDots] = useState<number[]>([]);
   const closeModal = () => setIsOpen(false);
-  const workspaceRef = useRef<Blockly.Workspace | null>(null);
+  const workspaceRef = useRef<Workspace | null>(null);
   const [indexs, setIndexes] = useState<number[]>([]);
   const [isUpdated, setIsUpdated] = useState<boolean>(false);
   const [Images, setImages] = useState<string[]>([]);
@@ -62,25 +61,25 @@ function Jump() {
   }, []);
 
   function areAllBlocksConnected() {
-    if(!workspaceRef.current) return
-    const blocks = workspaceRef.current.getAllBlocks(false)
- 
+    if (!workspaceRef.current) return;
+    const blocks = workspaceRef.current.getAllBlocks(false);
+
     let isConnected = true;
-    const size = blocks.length 
-    if(size  == 1) return true
+    const size = blocks.length;
+    if (size == 1) return true;
     blocks.forEach((block, i) => {
-      if (i == 0 || !isConnected) return
-      const parent = block.getParent()
-      if(!parent){
-        isConnected = false
-        return
+      if (i == 0 || !isConnected) return;
+      const parent = block.getParent();
+      if (!parent) {
+        isConnected = false;
+        return;
       }
-      isConnected = true
-    })
+      isConnected = true;
+    });
     return isConnected;
   }
 
-  function startMoving() {
+  async function startMoving() {
     if (!workspaceRef.current) return;
     //@ts-expect-error b/c i can't find other ways
     const size = workspaceRef.current.blockDB.size;
@@ -97,6 +96,7 @@ function Jump() {
       });
       return;
     }
+    const { javascriptGenerator } = await import('blockly/javascript');
     const isConnected = areAllBlocksConnected();
     if (!isConnected) {
       toast.error('Blocks Must be Connected Together ', {
@@ -112,7 +112,8 @@ function Jump() {
       return;
     }
     const code = javascriptGenerator.workspaceToCode(workspaceRef.current);
-    const walkIndex:number[] = []
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const walkIndex: number[] = [];
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, prefer-const
     let counter = 0;
     const jumpIndex: number[] = [];
@@ -124,21 +125,23 @@ function Jump() {
       setIsUpdated((prv) => !prv);
     }, 100);
     eval(strToExcute);
+    console.log(counter);
+    console.log(walkIndex);
   }
 
-
-
- type Block =  { x: number; isJump: boolean }[]
+  type Block = { x: number; isJump: boolean }[];
 
   function applyAnimation(posFromLeft: Block, isCorrect: boolean) {
     const { emojiRef, imageRef } = gameAreaChildRefs.current as IRefs;
-    const keyFrames = [{transform: `translate(0, 0)`}];
+    const keyFrames = [{ transform: `translate(0, 0)` }];
 
     posFromLeft.forEach(
       ({ x, isJump }: { x: number; isJump: boolean }, i: number, arr) => {
         if (isJump) {
           const prv = arr[i - 1]?.x ?? 0;
-          const transform = { transform: `translate(${i == 0 ? prv : prv - 50}px, -50px)` };
+          const transform = {
+            transform: `translate(${i == 0 ? prv : prv - 50}px, -50px)`,
+          };
           const transform2 = { transform: `translate(${prv + 20}px, -50px)` };
           const transform3 = { transform: `translate(${prv + 20}px, 0)` };
           keyFrames.push(transform, transform2, transform3);
@@ -174,9 +177,14 @@ function Jump() {
           clearInterval(interval1);
           setTimeout(() => {
             if (isCorrect) {
-              const levelFromLocalStorage = JSON.parse(localStorage.getItem('level-status-jump') as string) || {completedJUMP:[]}
-              levelFromLocalStorage.completedJUMP.push(1)
-              localStorage.setItem("level-status-jump", JSON.stringify(levelFromLocalStorage))
+              const levelFromLocalStorage = JSON.parse(
+                localStorage.getItem('level-status-jump') as string,
+              ) || { completedJUMP: [] };
+              levelFromLocalStorage.completedJUMP.push(1);
+              localStorage.setItem(
+                'level-status-jump',
+                JSON.stringify(levelFromLocalStorage),
+              );
               setGameStatus({ text: 'Great!', type: 'seccuss' });
             } else {
               setGameStatus({ text: 'Failed!', type: 'fail' });
@@ -194,6 +202,7 @@ function Jump() {
 
   useEffect(() => {
     generateKeyFrames(indexs);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isUpdated]);
 
   function generateKeyFrames(indexs: number[]) {
@@ -223,11 +232,10 @@ function Jump() {
     const isCorrect =
       indexs.length == 1 && indexs[0] == 3 && totalItem.length == 4;
     const sorted = [...forJump, ...postionForWalk].sort((a, b) => a.x - b.x);
-    type SortedType = typeof sorted;
     applyAnimation(sorted, isCorrect);
   }
 
-  const workspaceToCode = (workspace: Blockly.Workspace) => {
+  const workspaceToCode = (workspace: Workspace) => {
     if (workspace) {
       workspaceRef.current = workspace;
     }
@@ -244,9 +252,9 @@ function Jump() {
       ) : (
         <></>
       )}
-       <div className="absolute top-3 right-16">
-          <LevelToggler jumpOrWalk="JUMP" />
-        </div>
+      <div className="absolute top-3 right-16">
+        <LevelToggler jumpOrWalk="JUMP" />
+      </div>
       <div className="w-screen playArea h-screen  overflow-x-hidden">
         {gameStatus.text && (
           <ModalPart
@@ -280,7 +288,6 @@ function Jump() {
           >
             <AiOutlinePlayCircle className="w-24 h-24 " />
           </div>
-      
         </div>
       </div>
     </>

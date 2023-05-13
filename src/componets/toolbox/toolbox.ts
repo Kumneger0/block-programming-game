@@ -35,19 +35,16 @@ Blockly.common.defineBlocksWithJsonArray([
 javascriptGenerator['walk'] = function (_block: unknown) {
   const code = `(() => {
      counter++
-      walkIndex.push(counter)
+     if(walkIndex !== undefined){
+       walkIndex.push(counter)
+     }
     })();`;
   return code;
 };
 
-javascriptGenerator['counter'] = function (block : unknown) {
-  const inputValue = javascriptGenerator.valueToCode(
-    block,
-    'value',
-    javascriptGenerator.ORDER_ATOMIC,
-  );
-  const code = `counter`
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+javascriptGenerator['counter'] = function (_block: unknown) {
+  const code = `counter`;
   return [code, javascriptGenerator.ORDER_ATOMIC];
 };
 

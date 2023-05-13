@@ -1,6 +1,6 @@
-import React from "react";
-import DotsComponent from "../dots/dots";
-import { IRefs } from "../candyQuest/walk/walk";
+import React from 'react';
+import DotsComponent from '../dots/dots';
+import { IRefs } from '../candyQuest/walk/walk';
 const GameArea = React.forwardRef(
   (
     props: {
@@ -10,18 +10,33 @@ const GameArea = React.forwardRef(
       shadow: string;
       showObstacle: boolean;
     },
-    ref: React.ForwardedRef<IRefs>
+    ref: React.ForwardedRef<IRefs>,
   ) => {
     const { emoji, Dots, gum, shadow, showObstacle } = props;
     return (
       <div
-        ref={(el) => (ref.current.gameArea = el)}
+        ref={(el) => {
+          if (ref && 'current' in ref && ref.current) {
+            ref.current.gameArea = el;
+          }
+        }}
         className="w-4/5 mx-auto flex justify-around animationArea sm:-ml-3 sm:min-w-full sm:justify-center mt-10"
       >
         <div className="character">
-          <div ref={(el) => (ref.current.emojiRef = el)} className="w-24 -mt-4">
+          <div
+            ref={(el) => {
+              if (ref && 'current' in ref && ref.current) {
+                ref.current.emojiRef = el;
+              }
+            }}
+            className="w-24 -mt-4"
+          >
             <img
-              ref={(el) => (ref.current.imageRef = el)}
+              ref={(el) => {
+                if (ref && 'current' in ref && ref.current) {
+                  ref.current.imageRef = el;
+                }
+              }}
               src={emoji}
               alt=""
               className="w-full h-auto"
@@ -39,7 +54,11 @@ const GameArea = React.forwardRef(
         )}
         <div className="w-1/2 sm:-ml-8 -mt-4">
           <button
-            ref={(el) => (ref.current.gumRef = el)}
+            ref={(el) => {
+              if (ref && 'current' in ref && ref.current) {
+                ref.current.gumRef = el;
+              }
+            }}
             className="w-8 h-8 -ml-16 sm:-ml-2 z-10"
           >
             <img src={gum} alt="" />
@@ -47,7 +66,7 @@ const GameArea = React.forwardRef(
         </div>
       </div>
     );
-  }
+  },
 );
 
 export default GameArea;
