@@ -261,7 +261,7 @@ function Conditional() {
           />
         )}
         <div className="max-w-5xl h-auto flex mx-auto flex-nowrap justify-end responsive">
-          <div className="md:w-full w-3/4 sm:w-full h-80 justify-self-end relative">
+          <div className="md:w-11/12 w-4/5 sm:w-full h-80 justify-self-end relative">
             <Workspace2
               toolbox={toolboxForConditional}
               workspaceToCode={workspaceToCode}
@@ -276,13 +276,13 @@ function Conditional() {
           shadow={shadow}
           Dots={Dots}
         />
-        <div className="playBTN fixed bottom-0 right-24 w-9 p-8">
+        <div className="playBTN fixed bottom-0 right-10 w-9 p-8">
           <div
             role="button"
             onClick={startMoving}
             className="playBtn w-full hover:cursor-pointer"
           >
-            <AiOutlinePlayCircle className="w-24 h-24 " />
+            <AiOutlinePlayCircle className="w-16 h-20 sm:w-10 sm:h-10" />
           </div>
         </div>
       </div>

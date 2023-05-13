@@ -1,26 +1,29 @@
-import obstackle from "../../assets/image/obstackle.webp"
-// import { useContext } from "react";
-// import { levelcontext } from "../dashboad";
+import obstackle from '../../assets/image/obstackle.webp';
 
 export default function DotsComponent({
   Dots,
   shadow,
-  showObstacle
+  showObstacle,
 }: {
   Dots: number[];
   shadow: string;
-  showObstacle:boolean
+  showObstacle: boolean;
 }) {
-  // const { level,jumpOrWalk } = useContext(levelcontext)
   return (
     <>
       {Dots.map((_dot, i) => (
         <div
           key={i}
-          className="dot w-6 h-6 rounded-full self-end sm:w-10 sm:h-10 sm:mx-3"
+          className="dot w-7 h-6 sm:w-4 sm:h-4 rounded-full self-end sm:mx-2"
         >
           <img className="w-full" src={shadow} alt="" />
-          {i == 1 && showObstacle && <img className="w-full -mt-4 ml-7 sm:w-28 sm:-mt-8" src={obstackle} alt="" /> }
+          {i == 1 && showObstacle && (
+            <img
+              className="w-full -mt-7 ml-7 sm:ml-4 sm:w-28 sm:-mt-4 sm:"
+              src={obstackle}
+              alt=""
+            />
+          )}
         </div>
       ))}
     </>

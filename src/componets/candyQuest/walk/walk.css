@@ -1,41 +1,5 @@
-.playArea{
-    background: #F0C27B;  
-    background: -webkit-linear-gradient(to right, #4B1248, #F0C27B);  
-    background: linear-gradient(to right, rgb(75, 18, 72), #F0C27B); 
+.playArea {
+  background: #f0c27b;
+  background: -webkit-linear-gradient(to right, #4b1248, #f0c27b);
+  background: linear-gradient(to right, rgb(75, 18, 72), #f0c27b);
 }
-
-.emoji{
-    width: 100px;
-    animation-name: moveToRight;
-    animation-delay: 1s;
-    animation-fill-mode: forwards;
-    animation-iteration-count: 1;
-    animation-duration: 5s;
-    animation-timing-function: ease;
-}
-
-
-@media (width <= 768px){
-    .responsive{
-      width: 90vw !important;
-      justify-content: space-between!important;
-    }
-
-    .animationArea{
-        width: 90vw !important;
-        justify-content: space-between !important;
-    }
-.animationArea .character{
-    width: 100px;
-    height: auto;
-}
-
-    .animationArea .dot{
-        /* width: 50px; */
-    }
-    .animationArea .gum{
-        margin: 0 10px;
-    }
-}
-
-
