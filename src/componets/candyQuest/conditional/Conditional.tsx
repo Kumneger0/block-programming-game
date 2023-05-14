@@ -10,13 +10,14 @@ import shadow from '../../../assets/image/535805e584aafa4e55000016.webp';
 import { useRef, useState, useEffect } from 'react';
 import { ModalPart } from '../../modal/modal';
 import { AiOutlinePlayCircle } from 'react-icons/ai';
+import { Record } from '../walk/walk';
 export type GameStatus = { text: string | null; type: 'fail' | 'seccuss' };
 const allimages = import.meta.glob('../../../assets/image/images/walking/*');
 const images: string[] = [];
 Object.keys(allimages).forEach((key) => {
   allimages[key]().then((res) => {
-    //@ts-expect-error b/c no types available
-    const path = res.default;
+    const record = res as Record;
+    const path = record.default;
     images.push(path);
   });
 });
