@@ -3,7 +3,6 @@ import { Workspace } from 'blockly';
 import LoadImages from '../../loadImages/loadImages';
 import { Record } from '../walk/walk';
 import GameArea from '../../gameArea/gameArea';
-import { Helmet } from 'react-helmet';
 import LevelToggler from '../../levelToggler/levelToggler';
 import gum from '../../../assets/image/54650f8684aafa0d7d00004c.webp';
 import { Workspace2 } from '../../workspace/Workspace';

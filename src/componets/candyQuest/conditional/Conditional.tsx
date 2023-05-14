@@ -1,6 +1,6 @@
 import { Workspace } from 'blockly';
 import GameArea from '../../gameArea/gameArea';
-import { Helmet } from 'react-helmet';
+import LoadImages from '../../loadImages/loadImages';
 import { toolboxForConditional } from '../../toolbox/toolbox';
 import gum from '../../../assets/image/54650f8684aafa0d7d00004c.webp';
 import { Workspace2 } from '../../workspace/Workspace';
@@ -238,15 +238,7 @@ function Conditional() {
 
   return (
     <>
-      {Images.length ? (
-        <Helmet>
-          {Images.map((img) => {
-            return <link key={img} rel="preload" href={img} as="image" />;
-          })}{' '}
-        </Helmet>
-      ) : (
-        <></>
-      )}
+      {Images.length ? <LoadImages images={Images} /> : <></>}
       <div className="absolute top-3 right-16">
         <LevelToggler jumpOrWalk="JUMP" />
       </div>
