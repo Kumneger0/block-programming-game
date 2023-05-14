@@ -64,57 +64,42 @@ function Walk() {
     }
   }, []);
 
+  const showToast = async (toastMessage: string) => {
+    const { toast } = await import('react-toastify');
+    toast.error(toastMessage, {
+      position: 'top-center',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+    });
+  };
   async function startMoving() {
     if (!workspaceRef.current) return;
-    const { toast } = await import('react-toastify');
-    //@ts-expect-error b/c i can't find other ways
-    const size = workspaceRef.current.blockDB.size;
-    if (size == 0) {
-      toast.error('Connect Blocks To Play ', {
-        position: 'top-center',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      });
+    const length = workspaceRef.current.getAllBlocks(false).length;
+    if (length === 0) {
+      showToast('Connect Blocks to Play');
       return;
     }
     const { areAllBlocksConnected } = await import('../../../utils');
     const isConnected = areAllBlocksConnected(workspaceRef);
     if (!isConnected) {
-      toast.error('Blocks Must be Connected Together ', {
-        position: 'top-center',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      });
+      showToast('Blocks Must be Connected Together');
       return;
     }
     const { javascriptGenerator } = await import('blockly/javascript');
     const code = javascriptGenerator.workspaceToCode(workspaceRef.current);
     // eslint-disable-next-line prefer-const
     let counter = 0;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const walkIndex: number[] = [];
-    const strToExcute = `(() => {
-    ${code}
-  })();`;
-    eval(strToExcute);
+    eval(code);
+    console.log(counter);
     console.log(walkIndex);
-    let isCorrect: boolean;
-    if (Dots.length == counter) {
-      isCorrect = true;
-    } else {
-      isCorrect = false;
-    }
-    let diffrence = 0;
+    const isCorrect = Dots.length === counter;
+    let difference = 0;
     const { gameArea, emojiRef } = gameAreaChildRefs.current as IRefs;
     const childs = gameArea?.childNodes as NodeListOf<HTMLElement>;
     const targetPosition = childs[counter]?.getBoundingClientRect().x || 0;
@@ -125,8 +110,8 @@ function Walk() {
         applyAnimation(lastElementPosition + 100, isCorrect);
         return;
       }
-      diffrence = targetPosition - emojiRef.getBoundingClientRect().x;
-      applyAnimation(diffrence, isCorrect);
+      difference = targetPosition - emojiRef.getBoundingClientRect().x;
+      applyAnimation(difference, isCorrect);
     }
   }
 
@@ -137,9 +122,9 @@ function Walk() {
       emojiRef.animate(
         [
           { transform: `translateX(${0})` },
-          { transform: `translateX(${diffrence}px)` },
+          { transform: `translateX(${diffrence - 30}px)` },
         ],
-        { duration: 2000, fill: 'forwards' },
+        { duration: 2000, fill: 'forwards', easing: 'linear' },
       );
     }
     if (emojiRef) {
@@ -218,7 +203,7 @@ function Walk() {
           />
         )}
         <div className="max-w-5xl h-auto flex mx-auto flex-nowrap justify-end responsive">
-          <div className="md:w-11/12 w-4/5 sm:w-full h-80 justify-self-end workspace">
+          <div className="md:w-11/12 w-4/5 sm:w-full h-80 justify-self-end workspace mr-2">
             <Workspace2
               toolbox={
                 level == 1 || level == 2 ? toolbox : toolboxWithReaptBlock

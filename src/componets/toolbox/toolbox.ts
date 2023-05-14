@@ -31,8 +31,7 @@ Blockly.common.defineBlocksWithJsonArray([
   },
 ]);
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-javascriptGenerator['walk'] = function (_block: unknown) {
+javascriptGenerator['walk'] = function () {
   const code = `(() => {
      counter++
      if(walkIndex !== undefined){
@@ -42,16 +41,14 @@ javascriptGenerator['walk'] = function (_block: unknown) {
   return code;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-javascriptGenerator['counter'] = function (_block: unknown) {
+javascriptGenerator['counter'] = function () {
   const code = `counter`;
   return [code, javascriptGenerator.ORDER_ATOMIC];
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-javascriptGenerator['jump'] = function (_block: unknown) {
+javascriptGenerator['jump'] = function () {
   const code = `(() => {
-    console.log("counter :", counter)
      ++counter
      jumpIndex.push(counter)
     })();`;
