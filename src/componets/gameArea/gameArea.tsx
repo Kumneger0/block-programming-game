@@ -39,7 +39,7 @@ const GameArea = React.forwardRef(
               }}
               src={emoji}
               alt=""
-              className="w-full h-auto"
+              className="w-full h-auto md:w-10/12"
             />
           </div>
         </div>

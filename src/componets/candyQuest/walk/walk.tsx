@@ -1,8 +1,8 @@
 import './walk.css';
 import { Workspace } from 'blockly';
 import GameArea from '../../gameArea/gameArea';
+import LoadImages from '../../loadImages/loadImages';
 import LevelToggler from '../../levelToggler/levelToggler';
-import { Helmet } from 'react-helmet';
 import gum from '../../../assets/image/54650f8684aafa0d7d00004c.webp';
 import { Workspace2 } from '../../workspace/Workspace';
 import { toolbox, toolboxWithReaptBlock } from '../../toolbox/toolbox';
@@ -14,11 +14,15 @@ import { ModalPart } from '../../modal/modal';
 import { AiOutlinePlayCircle } from 'react-icons/ai';
 export type GameStatus = { text: string | null; type: 'fail' | 'seccuss' };
 const allimages = import.meta.glob('../../../assets/image/images/walking/*');
+
+export interface Record {
+  default: string;
+}
 const images: string[] = [];
 Object.keys(allimages).forEach((key) => {
   allimages[key]().then((res) => {
-    //@ts-expect-error b/c no types available
-    const path = res.default;
+    const record = res as Record;
+    const path = record.default;
     images.push(path);
   });
 });
@@ -200,15 +204,7 @@ function Walk() {
 
   return (
     <>
-      {Images.length ? (
-        <Helmet>
-          {Images.map((img) => {
-            return <link key={img} rel="preload" href={img} as="image" />;
-          })}{' '}
-        </Helmet>
-      ) : (
-        <></>
-      )}
+      {Images.length ? <LoadImages images={Images} /> : <></>}
       <div className="w-screen playArea h-screen  overflow-x-hidden">
         <div className="absolute top-3 right-16">
           <LevelToggler jumpOrWalk="WALK" />

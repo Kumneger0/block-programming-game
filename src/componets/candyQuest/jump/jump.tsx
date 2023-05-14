@@ -1,5 +1,7 @@
 import './jump.css';
 import { Workspace } from 'blockly';
+import LoadImages from '../../loadImages/loadImages';
+import { Record } from '../walk/walk';
 import GameArea from '../../gameArea/gameArea';
 import { Helmet } from 'react-helmet';
 import LevelToggler from '../../levelToggler/levelToggler';
@@ -17,8 +19,8 @@ const allimages = import.meta.glob('../../../assets/image/images/walking/*');
 const images: string[] = [];
 Object.keys(allimages).forEach((key) => {
   allimages[key]().then((res) => {
-    //@ts-expect-error b/c no types available
-    const path = res.default;
+    const record = res as Record;
+    const path = record.default;
     images.push(path);
   });
 });
@@ -208,10 +210,13 @@ function Jump() {
   function generateKeyFrames(indexs: number[]) {
     const postionForWalk: { x: number; isJump: boolean }[] = [];
     const { gameArea, emojiRef } = gameAreaChildRefs.current as IRefs;
+
     const emojiPosition = emojiRef?.getBoundingClientRect().x as number;
     const forJump: { x: number; isJump: boolean }[] = [];
+
     const childs = gameArea?.childNodes as NodeListOf<HTMLElement>;
     const totalItem = workspaceRef.current?.getAllBlocks(false);
+
     if (!totalItem?.length) return;
     totalItem?.forEach((item, i) => {
       if (item.type == 'walk') {
@@ -243,15 +248,7 @@ function Jump() {
 
   return (
     <>
-      {Images.length ? (
-        <Helmet>
-          {Images.map((img) => {
-            return <link key={img} rel="preload" href={img} as="image" />;
-          })}{' '}
-        </Helmet>
-      ) : (
-        <></>
-      )}
+      {Images.length ? <LoadImages images={Images} /> : <></>}
       <div className="absolute top-3 right-16">
         <LevelToggler jumpOrWalk="JUMP" />
       </div>

@@ -111,7 +111,6 @@ function Conditional() {
     }, 100);
     eval(code);
     setCounter(counter);
-    console.log(walkIndex);
   }
 
   type Block = { x: number; isJump: boolean }[];
@@ -126,7 +125,7 @@ function Conditional() {
       emojiRef?.animate(
         [
           { transform: `translate(0, 0)` },
-          { transform: `translate(${position}px, 0)` },
+          { transform: `translate(${position - 30}px, 0)` },
         ],
         {
           duration: 5000,

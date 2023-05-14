@@ -1,12 +1,12 @@
 import { MutableRefObject } from 'react';
-import * as Blockly from 'blockly';
+import { Workspace } from 'blockly';
 import { IRefs } from '../componets/candyQuest/walk/walk';
 
 export function areAllBlocksConnected(
-  workspaceRef: MutableRefObject<Blockly.Workspace | null>,
+  workspaceRef: MutableRefObject<Workspace | null>,
 ) {
   if (!workspaceRef.current) return;
-  const workspace = workspaceRef.current as unknown as Blockly.Workspace;
+  const workspace = workspaceRef.current as unknown as Workspace;
 
   const blocks = workspace.getAllBlocks(false);
 
@@ -32,7 +32,7 @@ export function generateKeyFrames({
   counter,
 }: {
   indexs: number[];
-  walkIndex: number[]|null;
+  walkIndex: number[] | null;
   gameAreaChildRefs: MutableRefObject<IRefs>;
   counter: number;
 }) {
@@ -48,8 +48,6 @@ export function generateKeyFrames({
 
   const forJump: { x: number; isJump: boolean }[] = [];
 
-//   const totalItem = workspaceRef.current?.getAllBlocks(false);
-//   if (!totalItem?.length) return;
   walkIndex?.forEach((index) => {
     const element = childs[index] || null;
     if (element) {
@@ -70,12 +68,12 @@ export function generateKeyFrames({
   return { isCorrect, sorted };
 }
 
-
-
-export const clearWorkspace = (workspaceRef: MutableRefObject<Blockly.Workspace | null>) => {
-  const blocks = workspaceRef.current?.getAllBlocks(false)
-  if(!blocks?.length) return
-  blocks?.forEach(block => {
-    block.dispose(true)
-  })
-}
+export const clearWorkspace = (
+  workspaceRef: MutableRefObject<Workspace | null>,
+) => {
+  const blocks = workspaceRef.current?.getAllBlocks(false);
+  if (!blocks?.length) return;
+  blocks?.forEach((block) => {
+    block.dispose(true);
+  });
+};
