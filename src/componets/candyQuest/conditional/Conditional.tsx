@@ -11,6 +11,7 @@ import { useRef, useState, useEffect } from 'react';
 import { ModalPart } from '../../modal/modal';
 import { AiOutlinePlayCircle } from 'react-icons/ai';
 import { Record } from '../walk/walk';
+import { WalkIndex } from '../jump/jump';
 export type GameStatus = { text: string | null; type: 'fail' | 'seccuss' };
 const allimages = import.meta.glob('../../../assets/image/images/walking/*');
 const images: string[] = [];
@@ -100,7 +101,8 @@ function Conditional() {
     // eslint-disable-next-line prefer-const,
     let counter = 0;
     const jumpIndex: number[] = [];
-    const walkIndex: number[] = [];
+    (window as unknown as WalkIndex).walkIndex = [];
+    const { walkIndex } = window as unknown as WalkIndex;
     setTimeout(() => {
       setIndexes(jumpIndex);
       setWalkIndex(walkIndex);

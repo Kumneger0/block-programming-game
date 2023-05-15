@@ -94,10 +94,7 @@ function Walk() {
     const code = javascriptGenerator.workspaceToCode(workspaceRef.current);
     // eslint-disable-next-line prefer-const
     let counter = 0;
-    const walkIndex: number[] = [];
     eval(code);
-    console.log(counter);
-    console.log(walkIndex);
     const isCorrect = Dots.length === counter;
     let difference = 0;
     const { gameArea, emojiRef } = gameAreaChildRefs.current as IRefs;

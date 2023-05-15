@@ -22,17 +22,18 @@ Blockly.common.defineBlocksWithJsonArray([
       {
         type: 'input_value',
         name: 'value',
-        check: 'Number',
+        check: '...',
       },
     ],
     output: 'Number',
     colour: 290,
-    tooltip: 'Set the value of the counter variable.',
+    tooltip: '',
   },
 ]);
 
 javascriptGenerator['walk'] = function () {
   const code = `(() => {
+    const {walkIndex} = window
      counter++
      if(walkIndex !== undefined){
        walkIndex.push(counter)
@@ -46,7 +47,6 @@ javascriptGenerator['counter'] = function () {
   return [code, javascriptGenerator.ORDER_ATOMIC];
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 javascriptGenerator['jump'] = function () {
   const code = `(() => {
      ++counter
@@ -71,7 +71,7 @@ export const toolboxWithReaptBlock = {
           shadow: {
             type: 'math_number',
             fields: {
-              NUM: 4,
+              NUM: 0,
             },
           },
         },

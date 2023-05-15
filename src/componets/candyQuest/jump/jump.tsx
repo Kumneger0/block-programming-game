@@ -34,6 +34,10 @@ export interface IRefs {
   gumRef: HTMLButtonElement | null;
 }
 
+export interface WalkIndex extends Window {
+  walkIndex: number[];
+}
+
 function Jump() {
   const [isOpen, setIsOpen] = useState(false);
   const [Dots, setDots] = useState<number[]>([]);
@@ -82,9 +86,8 @@ function Jump() {
 
   async function startMoving() {
     if (!workspaceRef.current) return;
-    //@ts-expect-error b/c i can't find other ways
-    const size = workspaceRef.current.blockDB.size;
-    if (size == 0) {
+    const length = workspaceRef.current.getAllBlocks(false).length;
+    if (length == 0) {
       toast.error('Connect Blocks To Play', {
         position: 'top-center',
         autoClose: 5000,
@@ -114,10 +117,11 @@ function Jump() {
     }
     const code = javascriptGenerator.workspaceToCode(workspaceRef.current);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const walkIndex: number[] = [];
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, prefer-const
     let counter = 0;
     const jumpIndex: number[] = [];
+    (window as unknown as WalkIndex).walkIndex = [];
+    const { walkIndex } = window as unknown as WalkIndex;
     const strToExcute = `(() => {
     ${code}
   })();`;
